@@ -28,6 +28,7 @@ Require Import Registers.
 Require Import ValueDomain.
 Require Import Op.
 Require Import RTL.
+(* Require Import Dependencies. *)
 
 (** * Neededness for values *)
 
@@ -277,9 +278,7 @@ Lemma iagree_shr:
 Proof.
   intros; red; intros. rewrite ! Int.bits_shr by auto.
   generalize (Int.unsigned_range n); intros.
-  set (j := if zlt (i + Int.unsigned n) Int.zwordsize
-            then i + Int.unsigned n
-            else Int.zwordsize - 1).
+  set (j := if zlt (i + Int.unsigned n) Int.zwordsize then i + Int.unsigned n else Int.zwordsize - 1).
   assert (0 <= j < Int.zwordsize).
   { unfold j; destruct (zlt (i + Int.unsigned n) Int.zwordsize); lia. }
   apply H; auto. autorewrite with ints; auto. apply orb_true_intro.
@@ -299,8 +298,7 @@ Proof.
   red; intros. rewrite ! Int.bits_rol by auto. apply H.
   apply Z_mod_lt; auto.
   rewrite Int.bits_ror.
-  replace (((i - Int.unsigned amount) mod Int.zwordsize + Int.unsigned amount)
-   mod Int.zwordsize) with i. auto.
+  replace (((i - Int.unsigned amount) mod Int.zwordsize + Int.unsigned amount) mod Int.zwordsize) with i. auto.
   apply eqmod_small_eq with Int.zwordsize; auto.
   apply eqmod_trans with ((i - Int.unsigned amount) + Int.unsigned amount).
   apply eqmod_refl2; lia.
@@ -449,19 +447,19 @@ Lemma and_sound:
   forall v1 w1 v2 w2 x,
   vagree v1 w1 (bitwise x) -> vagree v2 w2 (bitwise x) ->
   vagree (Val.and v1 v2) (Val.and w1 w2) x.
-Proof (vagree_bitwise_binop Int.and (iagree_bitwise_binop andb Int.and Int.bits_and)).
+Proof. apply (vagree_bitwise_binop Int.and (iagree_bitwise_binop andb Int.and Int.bits_and)). Qed.
 
 Lemma or_sound:
   forall v1 w1 v2 w2 x,
   vagree v1 w1 (bitwise x) -> vagree v2 w2 (bitwise x) ->
   vagree (Val.or v1 v2) (Val.or w1 w2) x.
-Proof (vagree_bitwise_binop Int.or (iagree_bitwise_binop orb Int.or Int.bits_or)).
+Proof. apply (vagree_bitwise_binop Int.or (iagree_bitwise_binop orb Int.or Int.bits_or)). Qed.
 
 Lemma xor_sound:
   forall v1 w1 v2 w2 x,
   vagree v1 w1 (bitwise x) -> vagree v2 w2 (bitwise x) ->
   vagree (Val.xor v1 v2) (Val.xor w1 w2) x.
-Proof (vagree_bitwise_binop Int.xor (iagree_bitwise_binop xorb Int.xor Int.bits_xor)).
+Proof. apply (vagree_bitwise_binop Int.xor (iagree_bitwise_binop xorb Int.xor Int.bits_xor)). Qed.
 
 Lemma notint_sound:
   forall v w x,
@@ -736,21 +734,12 @@ Lemma store_argument_sound:
   list_forall2 memval_lessdef (encode_val chunk v) (encode_val chunk w).
 Proof.
   intros.
-  assert (UNDEF: list_forall2 memval_lessdef
-                     (List.repeat Undef (size_chunk_nat chunk))
-                     (encode_val chunk w)).
-  {
-     rewrite <- (encode_val_length chunk w).
-     apply repeat_Undef_inject_any.
-  }
-  assert (SAME: forall vl1 vl2,
-                vl1 = vl2 ->
-                list_forall2 memval_lessdef vl1 vl2).
-  {
-     intros. subst vl2. revert vl1. induction vl1; constructor; auto.
-     apply memval_lessdef_refl.
-  }
-
+  assert (UNDEF: list_forall2 memval_lessdef (List.repeat Undef (size_chunk_nat chunk)) (encode_val chunk w)).
+  { rewrite <- (encode_val_length chunk w).
+     apply repeat_Undef_inject_any. }
+  assert (SAME: forall vl1 vl2, vl1 = vl2 -> list_forall2 memval_lessdef vl1 vl2).
+  { intros. subst vl2. revert vl1. induction vl1; constructor; auto.
+     apply memval_lessdef_refl. }
   intros. unfold store_argument in H; destruct chunk.
 - InvAgree. apply SAME. simpl; f_equal. apply encode_int_8_mod.
   change 8 with (Int.size (Int.repr 255)). apply iagree_eqmod; auto.
@@ -868,7 +857,9 @@ Proof.
   unfold inject_id; intros. inv H. rewrite Ptrofs.add_zero.
   rewrite Mem.weak_valid_pointer_spec in *.
   rewrite ! Mem.valid_pointer_nonempty_perm in *.
-  destruct H0; [left|right]; eauto.
+  destruct H0.
+  - left. eauto.
+  - right. eauto.
 Defined.
 
 Let weak_valid_pointer_no_overflow:
@@ -918,12 +909,10 @@ Proof.
   intros. assert (default nv = All) by (destruct nv; simpl; congruence).
   rewrite H2 in H0.
   assert (Val.lessdef_list args1 args2).
-  {
-    destruct H0. auto with na.
+  { destruct H0. auto with na.
     destruct H0. inv H0; constructor; auto with na.
     destruct H0. inv H0. constructor. inv H8; constructor; auto with na. 
-    inv H0; constructor; auto with na. inv H8; constructor; auto with na. inv H9; constructor; auto with na.
-  }
+    inv H0; constructor; auto with na. inv H8; constructor; auto with na. inv H9; constructor; auto with na. }
   exploit (@eval_operation_inj _ _ _ _ ge ge inject_id).
   eassumption. auto. auto. auto.
   instantiate (1 := op). intros. apply val_inject_lessdef; auto.
@@ -1069,9 +1058,9 @@ Module NVal <: SEMILATTICE.
   Proof. intros. constructor. Qed.
   Definition lub := nlub.
   Lemma ge_lub_left: forall x y, ge (lub x y) x.
-  Proof nge_lub_l.
+  Proof. apply nge_lub_l. Qed.
   Lemma ge_lub_right: forall x y, ge (lub x y) y.
-  Proof nge_lub_r.
+  Proof. apply nge_lub_r. Qed.
 End NVal.
 
 Module NE := LPMap1(NVal).
@@ -1210,8 +1199,7 @@ Lemma nlive_add:
 Proof.
   intros. unfold nmem_add. destruct nm. apply nlive_all.
   inv H1; try (apply nlive_all).
-  - (* Gl id ofs *)
-    assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
+  - assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
     destruct gl!id as [iv|] eqn:NG.
   + constructor; simpl; intros.
     congruence.
@@ -1222,18 +1210,15 @@ Proof.
     congruence.
     assert (id0 = id) by (eapply Genv.genv_vars_inj; eauto). subst id0.
     congruence.
-  - (* Glo id *)
-    assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
+  - assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
     constructor; simpl; intros.
     congruence.
     assert (id0 = id) by (eapply Genv.genv_vars_inj; eauto). subst id0.
     rewrite PTree.grs in H5. congruence.
-  - (* Stk ofs *)
-    constructor; simpl; intros.
+  - constructor; simpl; intros.
     rewrite ISet.In_remove. intros [A B]. elim A; auto.
     assert (bc b = BCglob id) by (eapply H; eauto). congruence.
-  - (* Stack *)
-    constructor; simpl; intros.
+  - constructor; simpl; intros.
     apply ISet.In_empty.
     assert (bc b = BCglob id) by (eapply H; eauto). congruence.
 Qed.
@@ -1243,21 +1228,17 @@ Lemma incl_nmem_add:
   nlive nm b i -> nlive (nmem_add nm p sz) b i.
 Proof.
   intros. inversion H; subst. unfold nmem_add; destruct p; try (apply nlive_all).
-- (* Gl id ofs *)
-  destruct gl!id as [iv|] eqn:NG.
+- destruct gl!id as [iv|] eqn:NG.
   + split; simpl; intros. auto.
     rewrite PTree.gsspec in H1. destruct (peq id0 id); eauto. inv H1.
     rewrite ISet.In_remove. intros [P Q]. eelim GL; eauto.
   + auto.
-- (* Glo id *)
-  split; simpl; intros. auto.
+- split; simpl; intros. auto.
   rewrite PTree.grspec in H1. destruct (PTree.elt_eq id0 id). congruence. eauto.
-- (* Stk ofs *)
-  split; simpl; intros.
+- split; simpl; intros.
   rewrite ISet.In_remove. intros [P Q]. eelim STK; eauto.
   eauto.
-- (* Stack *)
-  split; simpl; intros.
+- split; simpl; intros.
   apply ISet.In_empty.
   eauto.
 Qed.
@@ -1293,14 +1274,7 @@ Lemma nlive_remove:
   nlive (nmem_remove nm p sz) b' i.
 Proof.
   intros. inversion H2; subst. unfold nmem_remove; inv H1; auto.
-- (* Gl id ofs *)
-  set (iv' := match gl!id with
-                  | Some iv =>
-                      ISet.add (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) iv
-                  | None =>
-                      ISet.interval (Ptrofs.unsigned ofs)
-                        (Ptrofs.unsigned ofs + sz)
-              end).
+- set (iv' := match gl!id with | Some iv => ISet.add (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) iv | None => ISet.interval (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) end).
   assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
   split; simpl; auto; intros.
   rewrite PTree.gsspec in H6. destruct (peq id0 id).
@@ -1308,8 +1282,7 @@ Proof.
   unfold iv'; rewrite ISet.In_add. intros [P|P]. lia. eelim GL; eauto.
   unfold iv'; rewrite ISet.In_interval. lia.
 + eauto.
-- (* Stk ofs *)
-  split; simpl; auto; intros. destruct H3.
+- split; simpl; auto; intros. destruct H3.
   elim H3. subst b'. eapply bc_stack; eauto.
   rewrite ISet.In_add. intros [P|P]. lia. eapply STK; eauto.
 Qed.
@@ -1344,13 +1317,11 @@ Lemma nlive_contains:
 Proof.
   unfold nmem_contains; intros. red; intros L; inv L.
   inv H1; try discriminate.
-- (* Gl id ofs *)
-  assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
+- assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
   destruct gl!id as [iv|] eqn:HG; inv H2.
   destruct (ISet.contains (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) iv) eqn:IC; try discriminate.
   rewrite ISet.contains_spec in IC. eelim GL; eauto.
-- (* Stk ofs *)
-  destruct (ISet.contains (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) stk) eqn:IC; try discriminate.
+- destruct (ISet.contains (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) stk) eqn:IC; try discriminate.
   rewrite ISet.contains_spec in IC. eelim STK; eauto. eapply bc_stack; eauto.
 Qed.
 

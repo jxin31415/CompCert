@@ -1,6 +1,6 @@
 #!/bin/sh
 # Start coqide with the right options
-# Use the Makefile to rebuild dependencies if needed
+# Use the _CoqProject to rebuild dependencies if needed
 # Recompile the modified file after coqide editing
 
 make -q ${1}o || {

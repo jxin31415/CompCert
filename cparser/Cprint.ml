@@ -56,7 +56,6 @@ let const pp = function
     else
       fprintf pp "%s.%sE%s" v.intPart v.fracPart v.exp;
     begin match fk with
-      | FFloat16 -> () (* no syntax for FP16 literals; should not happen *)
       | FFloat -> fprintf pp "F"
       | FLongDouble -> fprintf pp "L"
       | FDouble -> ()
@@ -124,7 +123,6 @@ let name_of_ikind = function
   | IULongLong -> "unsigned long long"
 
 let name_of_fkind = function
-  | FFloat16 -> "_Float16"
   | FFloat -> "float"
   | FDouble -> "double"
   | FLongDouble -> "long double"

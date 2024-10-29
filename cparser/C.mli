@@ -46,10 +46,10 @@ type ikind =
 (** Kinds of floating-point numbers*)
 
 type fkind =
-  | FFloat16    (** [_Float16] *)
-  | FFloat      (** [float] *)
+    FFloat      (** [float] *)
   | FDouble     (** [double] *)
   | FLongDouble (** [long double] *)
+
 
 (** Constants *)
 

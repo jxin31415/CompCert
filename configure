@@ -104,7 +104,7 @@ Options:
 '
 
 #
-# Remove Leftover Makefile.config (if any)  (GPR#244)
+# Remove Leftover _CoqProject.config (if any)  (GPR#244)
 #
 rm -f Makefile.config
 
@@ -636,7 +636,7 @@ else
 fi
 
 #
-# Generate Makefile.config
+# Generate _CoqProject.config
 #
 
 rm -f Makefile.config

@@ -1,43 +1,12 @@
-(* *********************************************************************)
-(*                                                                     *)
-(*              The Compcert verified compiler                         *)
-(*                                                                     *)
-(*          Xavier Leroy, INRIA Paris-Rocquencourt                     *)
-(*                                                                     *)
-(*  Copyright Institut National de Recherche en Informatique et en     *)
-(*  Automatique.  All rights reserved.  This file is distributed       *)
-(*  under the terms of the INRIA Non-Commercial License Agreement.     *)
-(*                                                                     *)
-(* *********************************************************************)
-
-(** Register allocation by external oracle and a posteriori validation. *)
-
 Require Import FSets FSetAVLplus.
+
 Require Import Coqlib Ordered Maps Errors Integers Floats.
+
 Require Import AST Lattice Kildall Memdata.
+
 Require Archi.
+
 Require Import Op Registers RTL Locations Conventions RTLtyping LTL.
-
-(** The validation algorithm used here is described in
-  "Validating register allocation and spilling",
-  by Silvain Rideau and Xavier Leroy,
-  in Compiler Construction (CC 2010), LNCS 6011, Springer, 2010. *)
-
-(** * Structural checks *)
-
-(** As a first pass, we check the LTL code returned by the external oracle
-  against the original RTL code for structural conformance.
-  Each RTL instruction was transformed into a LTL basic block whose
-  shape must agree with the RTL instruction.  For example, if the RTL
-  instruction is [Istore(Mint32, addr, args, src, s)], the LTL basic block
-  must be of the following shape:
-- zero, one or several "move" instructions
-- a store instruction [Lstore(Mint32, addr, args', src')]
-- a [Lbranch s] instruction.
-
-  The [block_shape] type below describes all possible cases of structural
-  matching between an RTL instruction and an LTL basic block.
-*)
 
 Inductive move: Type :=
   | MV (src dst: loc)
@@ -95,9 +64,6 @@ Inductive block_shape: Type :=
   | BSreturn (arg: option reg)
          (mv: moves).
 
-(** Classify operations into moves, 64-bit split integer operations, and other
-  arithmetic/logical operations. *)
-
 Inductive operation_kind {A: Type}: operation -> list A -> Type :=
   | operation_Omove: forall arg, operation_kind Omove (arg :: nil)
   | operation_Omakelong: forall arg1 arg2, operation_kind Omakelong (arg1 :: arg2 :: nil)
@@ -113,13 +79,6 @@ Definition classify_operation {A: Type} (op: operation) (args: list A) : operati
   | Ohighlong, arg::nil => operation_Ohighlong arg
   | op, args => operation_other op args
   end.
-
-(** Extract the move instructions at the beginning of block [b].
-  Return the list of moves and the suffix of [b] after the moves.
-  Two versions are provided: [extract_moves], which extracts only
-  "true" moves, and [extract_moves_ext], which also extracts
-  the [makelong], [lowlong] and [highlong] operations over 64-bit integers.
-*)
 
 Fixpoint extract_moves (accu: moves) (b: bblock) {struct b} : moves * bblock :=
   match b with
@@ -178,10 +137,6 @@ Notation "'assertion' A ; B" := (if A then B else None)
          : option_monad_scope.
 
 Local Open Scope option_monad_scope.
-
-(** Check RTL instruction [i] against LTL basic block [b].
-  On success, return [Some] with a [block_shape] describing the correspondence.
-  On error, return [None]. *)
 
 Definition pair_Iop_block (op: operation) (args: list reg) (res: reg) (s: node) (b: LTL.bblock) :=
   let (mv1, b1) := extract_moves nil b in
@@ -338,39 +293,16 @@ Definition pair_instr_block
       end
   end.
 
-(** Check all instructions of the RTL function [f1] against the corresponding
-  basic blocks of LTL function [f2].  Return a map from CFG nodes to
-  [block_shape] info. *)
-
 Definition pair_codes (f1: RTL.function) (f2: LTL.function) : PTree.t block_shape :=
   PTree.combine
     (fun opti optb => do i <- opti; do b <- optb; pair_instr_block i b)
     (RTL.fn_code f1) (LTL.fn_code f2).
-
-(** Check the entry point code of the LTL function [f2].  It must be
-  a sequence of moves that branches to the same node as the entry point
-  of RTL function [f1]. *)
 
 Definition pair_entrypoints (f1: RTL.function) (f2: LTL.function) : option moves :=
   do b <- (LTL.fn_code f2)!(LTL.fn_entrypoint f2);
   let (mv, b1) := extract_moves_ext nil b in
   assertion (check_succ (RTL.fn_entrypoint f1) b1);
   Some mv.
-
-(** * Representing sets of equations between RTL registers and LTL locations. *)
-
-(** The Rideau-Leroy validation algorithm manipulates sets of equations of
-  the form [pseudoreg = location [kind]], meaning:
-- if [kind = Full], the value of [location] in the generated LTL code is
-  the same as (or more defined than) the value of [pseudoreg] in the original
-  RTL code;
-- if [kind = Low], the value of [location] in the generated LTL code is
-  the same as (or more defined than) the low 32 bits of the 64-bit
-  integer value of [pseudoreg] in the original RTL code;
-- if [kind = High], the value of [location] in the generated LTL code is
-  the same as (or more defined than) the high 32 bits of the 64-bit
-  integer value of [pseudoreg] in the original RTL code.
-*)
 
 Inductive equation_kind : Type := Full | Low | High.
 
@@ -380,148 +312,106 @@ Record equation := Eq {
   eloc: loc
 }.
 
-(** We use AVL finite sets to represent sets of equations.  Therefore, we need
-  total orders over equations and their components. *)
-
 Module IndexedEqKind <: INDEXED_TYPE.
-  Definition t := equation_kind.
-  Definition index (x: t) :=
+
+Definition t := equation_kind.
+
+Definition index (x: t) :=
     match x with Full => 1%positive | Low => 2%positive | High => 3%positive end.
-  Lemma index_inj: forall x y, index x = index y -> x = y.
-  Proof. destruct x; destruct y; simpl; congruence. Qed.
-  Definition eq (x y: t) : {x=y} + {x<>y}.
-  Proof. decide equality. Defined.
+
+Ltac custom_tac9 H0 := apply H0; auto.
+
+Ltac custom_tac1 H0 := unfold H0; intros.
+
+Ltac custom_tac3  := red; auto.
+
+Ltac custom_tac4  := red; intros.
+
+Ltac custom_tac10  := split; intros.
+
+Ltac custom_tac12  := auto; intros.
+
+Ltac custom_tac5 H0 H1 := unfold H0, H0; intros.
+
+Lemma index_inj: forall x y, index x = index y -> x = y.
+Proof. destruct x; destruct y; simpl; congruence. Qed.
+
+Definition eq (x y: t) : {x=y} + {x<>y}.
+Proof. decide equality. Defined.
+
 End IndexedEqKind.
 
 Module OrderedEqKind := OrderedIndexed(IndexedEqKind).
 
-(** This is an order over equations that is lexicographic on [ereg], then
-  [eloc], then [ekind]. *)
-
 Module OrderedEquation <: OrderedType.
-  Definition t := equation.
-  Definition eq (x y: t) := x = y.
-  Definition lt (x y: t) :=
+
+Definition t := equation.
+
+Definition eq (x y: t) := x = y.
+
+Definition lt (x y: t) :=
     Plt (ereg x) (ereg y) \/ (ereg x = ereg y /\
     (OrderedLoc.lt (eloc x) (eloc y) \/ (eloc x = eloc y /\
     OrderedEqKind.lt (ekind x) (ekind y)))).
-  Lemma eq_refl : forall x : t, eq x x.
-  Proof. unfold eq. auto. Qed.
-  Lemma eq_sym : forall x y : t, eq x y -> eq y x.
-  Proof. unfold eq. auto. Qed.
-  Lemma eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z.
-  Proof. unfold eq. intros. rewrite H. exact H0. Qed.
-  Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
-  Proof.
-    unfold lt; intros.
-    destruct H.
-    destruct H0. left; eapply Plt_trans; eauto.
-    destruct H0. rewrite <- H0. auto.
-    destruct H. rewrite H.
-    destruct H0. auto.
-    destruct H0. right; split; auto.
-    intuition.
-    left; eapply OrderedLoc.lt_trans; eauto.
-    left; congruence.
-    left; congruence.
-    right; split. congruence. eapply OrderedEqKind.lt_trans; eauto.
-  Qed.
-  Lemma lt_not_eq : forall x y : t, lt x y -> ~ eq x y.
-  Proof.
-    unfold lt, eq; intros; red; intros. subst y. intuition.
-    eelim Plt_strict; eauto.
-    eelim OrderedLoc.lt_not_eq; eauto. red; auto.
-    eelim OrderedEqKind.lt_not_eq; eauto. red; auto.
-  Qed.
-  Definition compare : forall x y : t, Compare lt eq x y.
-  Proof.
-    intros.
-    destruct (OrderedPositive.compare (ereg x) (ereg y)).
-  - apply LT. red; auto.
-  - destruct (OrderedLoc.compare (eloc x) (eloc y)).
-    + apply LT. red; auto.
-    + destruct (OrderedEqKind.compare (ekind x) (ekind y)).
-      * apply LT. red; auto.
-      * apply EQ. red in e; red in e0; red in e1; red.
-        destruct x; destruct y; simpl in *; congruence.
-      * apply GT. red; auto.
-   + apply GT. red; auto.
-  - apply GT. red; auto.
-  Defined.
-  Definition eq_dec (x y: t) : {x = y} + {x <> y}.
-  Proof.
-    intros. decide equality.
-    apply Loc.eq.
-    apply peq.
-    apply IndexedEqKind.eq.
-  Defined.
+
+Lemma eq_refl : forall x : t, eq x x.
+Proof. unfold eq. auto. Qed.
+
+Lemma eq_sym : forall x y : t, eq x y -> eq y x.
+Proof. unfold eq. auto. Qed.
+
+Lemma eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z.
+Proof. unfold eq. intros. rewrite H. exact H0. Qed.
+
+Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
+Proof. unfold lt; intros. destruct H. destruct H0. left; eapply Plt_trans; eauto. destruct H0. rewrite <- H0. auto. destruct H. rewrite H. destruct H0. auto. destruct H0. right; split; auto. intuition. left; eapply OrderedLoc.lt_trans; eauto. left; congruence. left; congruence. right; split. congruence. eapply OrderedEqKind.lt_trans; eauto. Qed.
+
+Lemma lt_not_eq : forall x y : t, lt x y -> ~ eq x y.
+Proof. unfold lt, eq; intros; red; intros. subst y. intuition. eelim Plt_strict; eauto. eelim OrderedLoc.lt_not_eq; eauto. red; auto. eelim OrderedEqKind.lt_not_eq; eauto. red; auto. Qed.
+
+Definition compare : forall x y : t, Compare lt eq x y.
+Proof. intros. destruct (OrderedPositive.compare (ereg x) (ereg y)). - apply LT. red; auto. - destruct (OrderedLoc.compare (eloc x) (eloc y)). + apply LT. red; auto. + destruct (OrderedEqKind.compare (ekind x) (ekind y)). * apply LT. red; auto. * apply EQ. red in e; red in e0; red in e1; red. destruct x; destruct y; simpl in *; congruence. * apply GT. red; auto. + apply GT. red; auto. - apply GT. red; auto. Defined.
+
+Definition eq_dec (x y: t) : {x = y} + {x <> y}.
+Proof. intros. decide equality. apply Loc.eq. apply peq. apply IndexedEqKind.eq. Defined.
+
 End OrderedEquation.
 
-(** This is an alternate order over equations that is lexicgraphic on
-  [eloc], then [ereg], then [ekind]. *)
-
 Module OrderedEquation' <: OrderedType.
-  Definition t := equation.
-  Definition eq (x y: t) := x = y.
-  Definition lt (x y: t) :=
+
+Definition t := equation.
+
+Definition eq (x y: t) := x = y.
+
+Definition lt (x y: t) :=
     OrderedLoc.lt (eloc x) (eloc y) \/ (eloc x = eloc y /\
     (Plt (ereg x) (ereg y) \/ (ereg x = ereg y /\
     OrderedEqKind.lt (ekind x) (ekind y)))).
-  Lemma eq_refl : forall x : t, eq x x.
-  Proof. unfold eq. auto. Qed.
-  Lemma eq_sym : forall x y : t, eq x y -> eq y x.
-  Proof. unfold eq. auto. Qed.
-  Lemma eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z.
-  Proof. unfold eq. intros. rewrite H. auto. Qed.
-  Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
-  Proof.
-    unfold lt; intros.
-    destruct H.
-    destruct H0. left; eapply OrderedLoc.lt_trans; eauto.
-    destruct H0. rewrite <- H0. auto.
-    destruct H. rewrite H.
-    destruct H0. auto.
-    destruct H0. right; split; auto.
-    intuition.
-    left; eapply Plt_trans; eauto.
-    left; congruence.
-    left; congruence.
-    right; split. congruence. eapply OrderedEqKind.lt_trans; eauto.
-  Qed.
-  Lemma lt_not_eq : forall x y : t, lt x y -> ~ eq x y.
-  Proof.
-    unfold lt, eq; intros; red; intros. subst y. intuition.
-    eelim OrderedLoc.lt_not_eq; eauto. red; auto.
-    eelim Plt_strict; eauto.
-    eelim OrderedEqKind.lt_not_eq; eauto. red; auto.
-  Qed.
-  Definition compare : forall x y : t, Compare lt eq x y.
-  Proof.
-    intros.
-    destruct (OrderedLoc.compare (eloc x) (eloc y)).
-  - apply LT. red; auto.
-  - destruct (OrderedPositive.compare (ereg x) (ereg y)).
-    + apply LT. red; auto.
-    + destruct (OrderedEqKind.compare (ekind x) (ekind y)).
-      * apply LT. red; auto.
-      * apply EQ. red in e; red in e0; red in e1; red.
-        destruct x; destruct y; simpl in *; congruence.
-      * apply GT. red; auto.
-   + apply GT. red; auto.
-  - apply GT. red; auto.
-  Defined.
-  Definition eq_dec: forall (x y: t), {x = y} + {x <> y} := OrderedEquation.eq_dec.
+
+Lemma eq_refl : forall x : t, eq x x.
+Proof. unfold eq. auto. Qed.
+
+Lemma eq_sym : forall x y : t, eq x y -> eq y x.
+Proof. unfold eq. auto. Qed.
+
+Lemma eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z.
+Proof. unfold eq. intros. rewrite H. auto. Qed.
+
+Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
+Proof. unfold lt; intros. destruct H. destruct H0. left; eapply OrderedLoc.lt_trans; eauto. destruct H0. rewrite <- H0. auto. destruct H. rewrite H. destruct H0. auto. destruct H0. right; split; auto. intuition. left; eapply Plt_trans; eauto. left; congruence. left; congruence. right; split. congruence. eapply OrderedEqKind.lt_trans; eauto. Qed.
+
+Lemma lt_not_eq : forall x y : t, lt x y -> ~ eq x y. Proof. unfold lt, eq; intros; red; intros. subst y. intuition. eelim OrderedLoc.lt_not_eq; eauto. red; auto. eelim Plt_strict; eauto. eelim OrderedEqKind.lt_not_eq; eauto. red; auto. Qed.
+
+Definition compare : forall x y : t, Compare lt eq x y.
+Proof. intros. destruct (OrderedLoc.compare (eloc x) (eloc y)). - apply LT. red; auto. - destruct (OrderedPositive.compare (ereg x) (ereg y)). + apply LT. red; auto. + destruct (OrderedEqKind.compare (ekind x) (ekind y)). * apply LT. red; auto. * apply EQ. red in e; red in e0; red in e1; red. destruct x; destruct y; simpl in *; congruence. * apply GT. red; auto. + apply GT. red; auto. - apply GT. red; auto. Defined.
+
+Definition eq_dec: forall (x y: t), {x = y} + {x <> y} := OrderedEquation.eq_dec.
+
 End OrderedEquation'.
 
 Module EqSet := FSetAVLplus.Make(OrderedEquation).
-Module EqSet2 := FSetAVLplus.Make(OrderedEquation').
 
-(** We use a redundant representation for sets of equations, comprising
-  two AVL finite sets, containing the same elements, but ordered along
-  the two orders defined above.  Playing on properties of lexicographic
-  orders, this redundant representation enables us to quickly find
-  all equations involving a given RTL pseudoregister, or all equations
-  involving a given LTL location or overlapping location. *)
+Module EqSet2 := FSetAVLplus.Make(OrderedEquation').
 
 Record eqs := mkeqs {
   eqs1 :> EqSet.t;
@@ -529,59 +419,31 @@ Record eqs := mkeqs {
   eqs_same: forall q, EqSet2.In q eqs2 <-> EqSet.In q eqs1
 }.
 
-(** * Operations on sets of equations *)
-
-(** The empty set of equations. *)
-
 Program Definition empty_eqs := mkeqs EqSet.empty EqSet2.empty _.
-Next Obligation.
-  split; intros. eelim EqSet2.empty_1; eauto. eelim EqSet.empty_1; eauto.
-Qed.
 
-(** Adding or removing an equation from a set. *)
+Next Obligation. split; intros. eelim EqSet2.empty_1; eauto. eelim EqSet.empty_1; eauto. Qed.
 
 Program Definition add_equation (q: equation) (e: eqs) :=
   mkeqs (EqSet.add q (eqs1 e)) (EqSet2.add q (eqs2 e)) _.
-Next Obligation.
-  split; intros.
-  destruct (OrderedEquation'.eq_dec q q0).
-  apply EqSet.add_1; auto.
-  apply EqSet.add_2. apply (eqs_same e). apply EqSet2.add_3 with q; auto.
-  destruct (OrderedEquation.eq_dec q q0).
-  apply EqSet2.add_1; auto.
-  apply EqSet2.add_2. apply (eqs_same e). apply EqSet.add_3 with q; auto.
-Qed.
+
+Next Obligation. split; intros. destruct (OrderedEquation'.eq_dec q q0). apply EqSet.add_1; auto. apply EqSet.add_2. apply (eqs_same e). apply EqSet2.add_3 with q; auto. destruct (OrderedEquation.eq_dec q q0). apply EqSet2.add_1; auto. apply EqSet2.add_2. apply (eqs_same e). apply EqSet.add_3 with q; auto. Qed.
 
 Program Definition remove_equation (q: equation) (e: eqs) :=
   mkeqs (EqSet.remove q (eqs1 e)) (EqSet2.remove q (eqs2 e)) _.
-Next Obligation.
-  split; intros.
-  destruct (OrderedEquation'.eq_dec q q0).
-  eelim EqSet2.remove_1; eauto.
-  apply EqSet.remove_2; auto. apply (eqs_same e). apply EqSet2.remove_3 with q; auto.
-  destruct (OrderedEquation.eq_dec q q0).
-  eelim EqSet.remove_1; eauto.
-  apply EqSet2.remove_2; auto. apply (eqs_same e). apply EqSet.remove_3 with q; auto.
-Qed.
 
-(** [reg_unconstrained r e] is true if [e] contains no equations involving
-  the RTL pseudoregister [r].  In other words, all equations [r' = l [kind]]
-  in [e] are such that [r' <> r]. *)
+Next Obligation. split; intros. destruct (OrderedEquation'.eq_dec q q0). eelim EqSet2.remove_1; eauto. apply EqSet.remove_2; auto. apply (eqs_same e). apply EqSet2.remove_3 with q; auto. destruct (OrderedEquation.eq_dec q q0). eelim EqSet.remove_1; eauto. apply EqSet2.remove_2; auto. apply (eqs_same e). apply EqSet.remove_3 with q; auto. Qed.
 
 Definition select_reg_l (r: reg) (q: equation) := Pos.leb r (ereg q).
+
 Definition select_reg_h (r: reg) (q: equation) := Pos.leb (ereg q) r.
 
 Definition reg_unconstrained (r: reg) (e: eqs) : bool :=
   negb (EqSet.mem_between (select_reg_l r) (select_reg_h r) (eqs1 e)).
 
-(** [loc_unconstrained l e] is true if [e] contains no equations involving
-  the LTL location [l] or a location that partially overlaps with [l].
-  In other words, all equations [r = l' [kind]] in [e] are such that
-  [Loc.diff l' l]. *)
-
 Definition select_loc_l (l: loc) :=
   let lb := OrderedLoc.diff_low_bound l in
   fun (q: equation) => match OrderedLoc.compare (eloc q) lb with LT _ => false | _ => true end.
+
 Definition select_loc_h (l: loc) :=
   let lh := OrderedLoc.diff_high_bound l in
   fun (q: equation) => match OrderedLoc.compare (eloc q) lh with GT _ => false | _ => true end.
@@ -592,20 +454,11 @@ Definition loc_unconstrained (l: loc) (e: eqs) : bool :=
 Definition reg_loc_unconstrained (r: reg) (l: loc) (e: eqs) : bool :=
   reg_unconstrained r e && loc_unconstrained l e.
 
-(** [subst_reg r1 r2 e] simulates the effect of assigning [r2] to [r1] on [e].
-  All equations of the form [r1 = l [kind]] are replaced by [r2 = l [kind]].
-*)
-
 Definition subst_reg (r1 r2: reg) (e: eqs) : eqs :=
   EqSet.fold
     (fun q e => add_equation (Eq (ekind q) r2 (eloc q)) (remove_equation q e))
     (EqSet.elements_between (select_reg_l r1) (select_reg_h r1) (eqs1 e))
     e.
-
-(** [subst_reg_kind r1 k1 r2 k2 e] simulates the effect of assigning
-  the [k2] part of [r2] to the [k1] part of [r1] on [e].
-  All equations of the form [r1 = l [k1]] are replaced by [r2 = l [k2]].
-*)
 
 Definition subst_reg_kind (r1: reg) (k1: equation_kind) (r2: reg) (k2: equation_kind) (e: eqs) : eqs :=
   EqSet.fold
@@ -615,12 +468,6 @@ Definition subst_reg_kind (r1: reg) (k1: equation_kind) (r2: reg) (k2: equation_
       else e)
     (EqSet.elements_between (select_reg_l r1) (select_reg_h r1) (eqs1 e))
     e.
-
-(** [subst_loc l1 l2 e] simulates the effect of assigning [l2] to [l1] on [e].
-  All equations of the form [r = l1 [kind]] are replaced by [r = l2 [kind]].
-  Return [None] if [e] contains an equation of the form [r = l] with [l]
-  partially overlapping [l1].
-*)
 
 Definition subst_loc (l1 l2: loc) (e: eqs) : option eqs :=
   EqSet2.fold
@@ -635,14 +482,6 @@ Definition subst_loc (l1 l2: loc) (e: eqs) : option eqs :=
       end)
      (EqSet2.elements_between (select_loc_l l1) (select_loc_h l1) (eqs2 e))
      (Some e).
-
-(** [subst_loc_part l1 l2 k e] simulates the effect of assigning
-  [l2] to the [k] part of [l1] on [e].
-  All equations of the form [r = l1 [k]] are replaced by [r = l2 [Full]].
-  Return [None] if [e] contains an equation of the form [r = l] with [l]
-  partially overlapping [l1], or an equation of the form [r = l1] with
-  a kind different from [k1].
-*)
 
 Definition subst_loc_part (l1: loc) (l2: loc) (k: equation_kind) (e: eqs) : option eqs :=
   EqSet2.fold
@@ -659,13 +498,6 @@ Definition subst_loc_part (l1: loc) (l2: loc) (k: equation_kind) (e: eqs) : opti
       end)
      (EqSet2.elements_between (select_loc_l l1) (select_loc_h l1) (eqs2 e))
      (Some e).
-
-(** [subst_loc_pair l1 l2 l2'] simulates the effect of assigning
-  [makelong l2 l2'] to [l1].  All equations of the form [r = l1 [Full]]
-  are replaced by the two equations [r = l2 [High], r = l2' [Low]].
-  Return [None] if [e] contains an equation of the form [r = l] with [l]
-  partially overlapping [l1], or an equation of the form [r = l1] with
-  a kind different from [Full]. *)
 
 Definition subst_loc_pair (l1 l2 l2': loc) (e: eqs) : option eqs :=
   EqSet2.fold
@@ -685,9 +517,6 @@ Definition subst_loc_pair (l1 l2 l2': loc) (e: eqs) : option eqs :=
      (EqSet2.elements_between (select_loc_l l1) (select_loc_h l1) (eqs2 e))
      (Some e).
 
-(** [loc_type_compat env l e] checks that for all equations [r = l] in [e],
-  the type [env r] of [r] is compatible with the type of [l]. *)
-
 Definition sel_type (k: equation_kind) (ty: typ) : typ :=
   match k with
   | Full => ty
@@ -699,17 +528,10 @@ Definition loc_type_compat (env: regenv) (l: loc) (e: eqs) : bool :=
     (fun q => subtype (sel_type (ekind q) (env (ereg q))) (Loc.type l))
     (select_loc_l l) (select_loc_h l) (eqs2 e).
 
-(** [long_type_compat env l e] checks that for all equations [r = l] in [e].
-  then type [env r] of [r] is compatible with the type [Tlong]. *)
-
 Definition long_type_compat (env: regenv) (l: loc) (e: eqs) : bool :=
   EqSet2.for_all_between
     (fun q => subtype (env (ereg q)) Tlong)
     (select_loc_l l) (select_loc_h l) (eqs2 e).
-
-(** [add_equations [r1...rN] [m1...mN] e] adds to [e] the [N] equations
-    [ri = R mi [Full]].  Return [None] if the two lists have different lengths.
-*)
 
 Fixpoint add_equations (rl: list reg) (ml: list mreg) (e: eqs) : option eqs :=
   match rl, ml with
@@ -717,10 +539,6 @@ Fixpoint add_equations (rl: list reg) (ml: list mreg) (e: eqs) : option eqs :=
   | r1 :: rl, m1 :: ml => add_equations rl ml (add_equation (Eq Full r1 (R m1)) e)
   | _, _ => None
   end.
-
-(** [add_equations_args] is similar but additionally handles the splitting
-  of pseudoregisters of type [Tlong] in two locations containing the
-  two 32-bit halves of the 64-bit integer. *)
 
 Function add_equations_args (rl: list reg) (tyl: list typ) (ll: list (rpair loc)) (e: eqs) : option eqs :=
   match rl, tyl, ll with
@@ -733,9 +551,6 @@ Function add_equations_args (rl: list reg) (tyl: list typ) (ll: list (rpair loc)
   | _, _, _ => None
   end.
 
-(** [add_equations_res] is similar but is specialized to the case where
-  there is only one pseudo-register. *)
-
 Function add_equations_res (r: reg) (ty: typ) (p: rpair mreg) (e: eqs) : option eqs :=
   match p, ty with
   | One mr, _ =>
@@ -747,9 +562,6 @@ Function add_equations_res (r: reg) (ty: typ) (p: rpair mreg) (e: eqs) : option 
       None
   end.
 
-(** [remove_equations_res] is similar to [add_equations_res] but removes
-  equations instead of adding them. *)
-
 Function remove_equations_res (r: reg) (p: rpair mreg) (e: eqs) : option eqs :=
   match p with
   | One mr =>
@@ -760,19 +572,12 @@ Function remove_equations_res (r: reg) (p: rpair mreg) (e: eqs) : option eqs :=
       else Some (remove_equation (Eq Low r (R mr2)) (remove_equation (Eq High r (R mr1)) e))
   end.
 
-(** [add_equations_ros] adds an equation, if needed, between an optional
-  pseudoregister and an optional machine register.  It is used for the
-  function argument of the [Icall] and [Itailcall] instructions. *)
-
 Definition add_equation_ros (ros: reg + ident) (ros': mreg + ident) (e: eqs) : option eqs :=
   match ros, ros' with
   | inl r, inl mr => Some(add_equation (Eq Full r (R mr)) e)
   | inr id, inr id' => assertion (ident_eq id id'); Some e
   | _, _ => None
   end.
-
-(** [add_equations_builtin_arg] adds the needed equations for arguments
-    to builtin functions. *)
 
 Fixpoint add_equations_builtin_arg
      (env: regenv) (arg: builtin_arg reg) (arg': builtin_arg loc) (e: eqs) : option eqs :=
@@ -828,8 +633,6 @@ Fixpoint add_equations_builtin_args
   | _, _ => None
   end.
 
-(** For [EF_debug] builtins, some arguments can be removed. *)
-
 Fixpoint add_equations_debug_args
    (env: regenv) (args: list (builtin_arg reg))
    (args': list (builtin_arg loc)) (e: eqs) : option eqs :=
@@ -842,8 +645,6 @@ Fixpoint add_equations_debug_args
       end
   | _, _ => None
   end.
-
-(** Checking of the result of a builtin *)
 
 Definition remove_equations_builtin_res
     (env: regenv) (res: builtin_res reg) (res': builtin_res mreg) (e: eqs) : option eqs :=
@@ -858,9 +659,6 @@ Definition remove_equations_builtin_res
   | _, _ => None
   end.
 
-(** [can_undef ml] returns true if all machine registers in [ml] are
-  unconstrained and can harmlessly be undefined. *)
-
 Fixpoint can_undef (ml: list mreg) (e: eqs) : bool :=
   match ml with
   | nil => true
@@ -874,10 +672,6 @@ Fixpoint can_undef_except (l: loc) (ml: list mreg) (e: eqs) : bool :=
       (Loc.eq l (R m1) || loc_unconstrained (R m1) e) && can_undef_except l ml e
   end.
 
-(** [no_caller_saves e] returns [e] if all caller-save locations are
-  unconstrained in [e].  In other words, [e] contains no equations
-  involving a caller-save register or [Outgoing] stack slot. *)
-
 Definition no_caller_saves (e: eqs) : bool :=
   EqSet.for_all
    (fun eq =>
@@ -888,9 +682,6 @@ Definition no_caller_saves (e: eqs) : bool :=
        end)
     e.
 
-(** [compat_left r l e] returns true if all equations in [e] that involve
-    [r] are of the form [r = l [Full]]. *)
-
 Definition compat_left (r: reg) (l: loc) (e: eqs) : bool :=
   EqSet.for_all_between
     (fun q =>
@@ -900,9 +691,6 @@ Definition compat_left (r: reg) (l: loc) (e: eqs) : bool :=
         end)
     (select_reg_l r) (select_reg_h r)
     (eqs1 e).
-
-(** [compat_left2 r l1 l2 e] returns true if all equations in [e] that involve
-    [r] are of the form [r = l1 [High]] or [r = l2 [Low]]. *)
 
 Definition compat_left2 (r: reg) (l1 l2: loc) (e: eqs) : bool :=
   EqSet.for_all_between
@@ -915,17 +703,11 @@ Definition compat_left2 (r: reg) (l1 l2: loc) (e: eqs) : bool :=
     (select_reg_l r) (select_reg_h r)
     (eqs1 e).
 
-(** [ros_compatible_tailcall ros] returns true if [ros] is a function
-  name or a caller-save register.  This is used to check [Itailcall]
-  instructions. *)
-
 Definition ros_compatible_tailcall (ros: mreg + ident) : bool :=
   match ros with
   | inl r => negb (is_callee_save r)
   | inr id => true
   end.
-
-(** * The validator *)
 
 Definition destroyed_by_move (src dst: loc) :=
   match src, dst with
@@ -939,12 +721,6 @@ Definition well_typed_move (env: regenv) (dst: loc) (e: eqs) : bool :=
   | R r => true
   | S sl ofs ty => loc_type_compat env dst e
   end.
-
-(** Simulate the effect of a sequence of moves [mv] on a set of
-  equations [e].  The set [e] is the equations that must hold
-  after the sequence of moves.  Return the set of equations that
-  must hold before the sequence of moves.  Return [None] if the
-  set of equations [e] cannot hold after the sequence of moves. *)
 
 Fixpoint track_moves (env: regenv) (mv: moves) (e: eqs) : option eqs :=
   match mv with
@@ -969,19 +745,6 @@ Fixpoint track_moves (env: regenv) (mv: moves) (e: eqs) : option eqs :=
       subst_loc_part (R dst) (R src) High e1
   end.
 
-(** [transfer_use_def args res args' res' undefs e] returns the set
-  of equations that must hold "before" in order for the equations [e]
-  to hold "after" the execution of RTL and LTL code of the following form:
-<<
-                RTL                            LTL
-         use pseudoregs args            use machine registers args'
-         define pseudoreg res           undefine machine registers undef
-                                        define machine register res'
->>
-  As usual, [None] is returned if the equations [e] cannot hold after
-  this execution.
-*)
-
 Definition transfer_use_def (args: list reg) (res: reg) (args': list mreg) (res': mreg)
                             (undefs: list mreg) (e: eqs) : option eqs :=
   let e1 := remove_equation (Eq Full res (R res')) e in
@@ -990,13 +753,8 @@ Definition transfer_use_def (args: list reg) (res: reg) (args': list mreg) (res'
   add_equations args args' e1.
 
 Definition kind_first_word := if Archi.big_endian then High else Low.
-Definition kind_second_word := if Archi.big_endian then Low else High.
 
-(** The core transfer function.  It takes a set [e] of equations that must
-  hold "after" and a block shape [shape] representing a matching pair
-  of an RTL instruction and an LTL basic block.  It returns the set of
-  equations that must hold "before" these instructions, or [None] if
-  impossible. *)
+Definition kind_second_word := if Archi.big_endian then Low else High.
 
 Definition transfer_aux (f: RTL.function) (env: regenv)
                         (shape: block_shape) (e: eqs) : option eqs :=
@@ -1120,11 +878,6 @@ Definition transfer_aux (f: RTL.function) (env: regenv)
       track_moves env mv e1
   end.
 
-(** The main transfer function for the dataflow analysis.  Like [transfer_aux],
-  it infers the equations that must hold "before" as a function of the
-  equations that must hold "after".  It also handles error propagation
-  and reporting. *)
-
 Definition transfer (f: RTL.function) (env: regenv) (shapes: PTree.t block_shape)
                     (pc: node) (after: res eqs) : res eqs :=
   match after with
@@ -1140,83 +893,55 @@ Definition transfer (f: RTL.function) (env: regenv) (shapes: PTree.t block_shape
       end
   end.
 
-(** The semilattice for dataflow analysis.  Operates on analysis results
-  of type [res eqs], that is, either a set of equations or an error
-  message.  Errors correspond to [Top].  Sets of equations are ordered
-  by inclusion. *)
-
 Module LEq <: SEMILATTICE.
 
-  Definition t := res eqs.
+Definition t := res eqs.
 
-  Definition eq (x y: t) :=
+Definition eq (x y: t) :=
     match x, y with
     | OK a, OK b => EqSet.Equal a b
     | Error _, Error _ => True
     | _, _ => False
     end.
 
-  Lemma eq_refl: forall x, eq x x.
-  Proof.
-    intros; destruct x; simpl; auto. red; tauto.
-  Qed.
+Lemma eq_refl: forall x, eq x x.
+Proof. intros; destruct x; simpl; auto. red; tauto. Qed.
 
-  Lemma eq_sym: forall x y, eq x y -> eq y x.
-  Proof.
-    unfold eq; intros; destruct x; destruct y; auto.
-    red in H; red; intros. rewrite H; tauto.
-  Qed.
+Lemma eq_sym: forall x y, eq x y -> eq y x.
+Proof. unfold eq; intros; destruct x; destruct y; auto. red in H; red; intros. rewrite H; tauto. Qed.
 
-  Lemma eq_trans: forall x y z, eq x y -> eq y z -> eq x z.
-  Proof.
-    unfold eq; intros. destruct x; destruct y; try contradiction; destruct z; auto.
-    red in H; red in H0; red; intros. rewrite H. auto.
-  Qed.
+Lemma eq_trans: forall x y z, eq x y -> eq y z -> eq x z.
+Proof. unfold eq; intros. destruct x; destruct y; try contradiction; destruct z; auto. red in H; red in H0; red; intros. rewrite H. auto. Qed.
 
-  Definition beq (x y: t) :=
+Definition beq (x y: t) :=
     match x, y with
     | OK a, OK b => EqSet.equal a b
     | Error _, Error _ => true
     | _, _ => false
     end.
 
-  Lemma beq_correct: forall x y, beq x y = true -> eq x y.
-  Proof.
-    unfold beq, eq; intros. destruct x; destruct y.
-    apply EqSet.equal_2. auto.
-    discriminate.
-    discriminate.
-    auto.
-  Qed.
+Lemma beq_correct: forall x y, beq x y = true -> eq x y.
+Proof. unfold beq, eq; intros. destruct x; destruct y. apply EqSet.equal_2. auto. discriminate. discriminate. auto. Qed.
 
-  Definition ge (x y: t) :=
+Definition ge (x y: t) :=
     match x, y with
     | OK a, OK b => EqSet.Subset b a
     | Error _, _ => True
     | _, Error _ => False
     end.
 
-  Lemma ge_refl: forall x y, eq x y -> ge x y.
-  Proof.
-    unfold eq, ge, EqSet.Equal, EqSet.Subset; intros.
-    destruct x; destruct y; auto. intros; rewrite H; auto.
-  Qed.
-  Lemma ge_trans: forall x y z, ge x y -> ge y z -> ge x z.
-  Proof.
-    unfold ge, EqSet.Subset; intros.
-    destruct x; auto; destruct y; try contradiction.
-    destruct z; eauto.
-  Qed.
+Lemma ge_refl: forall x y, eq x y -> ge x y.
+Proof. unfold eq, ge, EqSet.Equal, EqSet.Subset; intros. destruct x; destruct y; auto. intros; rewrite H; auto. Qed.
 
-  Definition bot: t := OK empty_eqs.
+Lemma ge_trans: forall x y z, ge x y -> ge y z -> ge x z.
+Proof. unfold ge, EqSet.Subset; intros. destruct x; auto; destruct y; try contradiction. destruct z; eauto. Qed.
 
-  Lemma ge_bot: forall x, ge x bot.
-  Proof.
-    unfold ge, bot, EqSet.Subset; simpl; intros.
-    destruct x; auto. intros. elim (EqSet.empty_1 H).
-  Qed.
+Definition bot: t := OK empty_eqs.
 
-  Program Definition lub (x y: t) : t :=
+Lemma ge_bot: forall x, ge x bot.
+Proof. unfold ge, bot, EqSet.Subset; simpl; intros. destruct x; auto. intros. elim (EqSet.empty_1 H). Qed.
+
+Program Definition lub (x y: t) : t :=
     match x, y return _ with
     | OK a, OK b =>
         OK (mkeqs (EqSet.union (eqs1 a) (eqs1 b))
@@ -1224,37 +949,18 @@ Module LEq <: SEMILATTICE.
     | OK _, Error _ => y
     | Error _, _ => x
     end.
-  Next Obligation.
-    split; intros.
-    apply EqSet2.union_1 in H. destruct H; rewrite eqs_same in H.
-    apply EqSet.union_2; auto. apply EqSet.union_3; auto.
-    apply EqSet.union_1 in H. destruct H; rewrite <- eqs_same in H.
-    apply EqSet2.union_2; auto. apply EqSet2.union_3; auto.
-  Qed.
 
-  Lemma ge_lub_left: forall x y, ge (lub x y) x.
-  Proof.
-    unfold lub, ge, EqSet.Subset; intros.
-    destruct x; destruct y; auto.
-    intros; apply EqSet.union_2; auto.
-  Qed.
+Next Obligation. split; intros. apply EqSet2.union_1 in H. destruct H; rewrite eqs_same in H. apply EqSet.union_2; auto. apply EqSet.union_3; auto. apply EqSet.union_1 in H. destruct H; rewrite <- eqs_same in H. apply EqSet2.union_2; auto. apply EqSet2.union_3; auto. Qed.
 
-  Lemma ge_lub_right: forall x y, ge (lub x y) y.
-  Proof.
-    unfold lub, ge, EqSet.Subset; intros.
-    destruct x; destruct y; auto.
-    intros; apply EqSet.union_3; auto.
-  Qed.
+Lemma ge_lub_left: forall x y, ge (lub x y) x.
+Proof. unfold lub, ge, EqSet.Subset; intros. destruct x; destruct y; auto. intros; apply EqSet.union_2; auto. Qed.
+
+Lemma ge_lub_right: forall x y, ge (lub x y) y.
+Proof. unfold lub, ge, EqSet.Subset; intros. destruct x; destruct y; auto. intros; apply EqSet.union_3; auto. Qed.
 
 End LEq.
 
-(** The backward dataflow solver is an instantiation of Kildall's algorithm. *)
-
 Module DS := Backward_Dataflow_Solver(LEq)(NodeSetBackward).
-
-(** The control-flow graph that the solver operates on is the CFG of
-  block shapes built by the structural check phase.  Here is its notion
-  of successors. *)
 
 Definition successors_block_shape (bsh: block_shape) : list node :=
   match bsh with
@@ -1283,22 +989,6 @@ Definition successors_block_shape (bsh: block_shape) : list node :=
 Definition analyze (f: RTL.function) (env: regenv) (bsh: PTree.t block_shape) :=
   DS.fixpoint_allnodes bsh successors_block_shape (transfer f env bsh).
 
-(** * Validating and translating functions and programs *)
-
-(** Checking equations at function entry point.  The RTL function receives
-  its arguments in the list [rparams] of pseudoregisters.  The LTL function
-  receives them in the list [lparams] of locations dictated by the
-  calling conventions, with arguments of type [Tlong] being split in
-  two 32-bit halves.  We check that the equations [e] that must hold
-  at the beginning of the functions are compatible with these calling
-  conventions, in the sense that all equations involving a pseudoreg
-  [r] from [rparams] is of the form [r = l [Full]] or [r = l [Low]]
-  or [r = l [High]], where [l] is the corresponding element of [lparams].
-
-  Note that [e] can contain additional equations [r' = l [kind]]
-  involving pseudoregs [r'] not in [rparams]: these equations are
-  automatically satisfied since the initial value of [r'] is [Vundef]. *)
-
 Function compat_entry (rparams: list reg) (lparams: list (rpair loc)) (e: eqs)
                       {struct rparams} : bool :=
   match rparams, lparams with
@@ -1309,10 +999,6 @@ Function compat_entry (rparams: list reg) (lparams: list (rpair loc)) (e: eqs)
       compat_left2 r1 l1 l2 e && compat_entry rl ll e
   | _, _ => false
   end.
-
-(** Checking the satisfiability of equations inferred at function entry
-  point.  We also check that the RTL and LTL functions agree in signature
-  and stack size. *)
 
 Definition check_entrypoints_aux (rtl: RTL.function) (ltl: LTL.function)
                                  (env: regenv) (e1: eqs) : option unit :=
@@ -1326,6 +1012,7 @@ Definition check_entrypoints_aux (rtl: RTL.function) (ltl: LTL.function)
   Some tt.
 
 Local Close Scope option_monad_scope.
+
 Local Open Scope error_monad_scope.
 
 Definition check_entrypoints (rtl: RTL.function) (ltl: LTL.function)
@@ -1337,10 +1024,6 @@ Definition check_entrypoints (rtl: RTL.function) (ltl: LTL.function)
   | Some _ => OK tt
   end.
 
-(** Putting it all together, this is the validation function for
-  a source RTL function and an LTL function generated by the external
-  register allocator. *)
-
 Definition check_function (rtl: RTL.function) (ltl: LTL.function) (env: regenv): res unit :=
   let bsh := pair_codes rtl ltl in
   match analyze rtl env bsh with
@@ -1348,12 +1031,7 @@ Definition check_function (rtl: RTL.function) (ltl: LTL.function) (env: regenv):
   | Some a => check_entrypoints rtl ltl env bsh a
   end.
 
-(** [regalloc] is the external register allocator.  It is written in OCaml
-  in file [backend/Regalloc.ml]. *)
-
 Parameter regalloc: RTL.function -> res LTL.function.
-
-(** Register allocation followed by validation. *)
 
 Definition transf_function (f: RTL.function) : res LTL.function :=
   match type_function f with
@@ -1370,4 +1048,6 @@ Definition transf_fundef (fd: RTL.fundef) : res LTL.fundef :=
 
 Definition transf_program (p: RTL.program) : res LTL.program :=
   transform_partial_program transf_fundef p.
+
+
 
