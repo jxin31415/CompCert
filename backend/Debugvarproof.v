@@ -176,8 +176,10 @@ Proof.
   inv H2. auto. apply Plt_trans with v0; eauto.
   constructor; auto.
 + constructor.
-  red; intros. exploit set_state_3. eexact H0. eauto. intros [[A B] | [A B]]; subst; eauto.
-  auto.
+  red; intros. exploit set_state_3. eexact H0. eauto. intros [[A B] | [A B]].
+    * subst v' i'; eauto.
+    * eauto.
+    * eauto.
 Qed.
 
 Lemma remove_state_1:

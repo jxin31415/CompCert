@@ -370,7 +370,7 @@ Lemma add_var_valid:
 Proof.
   intros. monadInv H.
   split. eauto with rtlg.
-  inversion EQ. subst. red. intros r' [[id A] | B].
+  inversion EQ. subst r s2. red. intros r' [[id A] | B].
   simpl in A. rewrite PTree.gsspec in A. destruct (peq id name).
   inv A. eauto with rtlg.
   apply reg_valid_incr with s1. eauto with rtlg.

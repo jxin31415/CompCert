@@ -1125,7 +1125,7 @@ Lemma eagree_update_dead:
   eagree e1 e2 ne -> eagree (e1#r <- v1) e2 ne.
 Proof.
   intros; red; intros. rewrite PMap.gsspec.
-  destruct (peq r0 r); auto. subst. unfold nreg in H. rewrite H. red; auto.
+  destruct (peq r0 r); auto. subst r0. unfold nreg in H. rewrite H. red; auto.
 Qed.
 
 (** * Neededness for memory locations *)
@@ -1227,7 +1227,7 @@ Lemma incl_nmem_add:
   forall nm b i p sz,
   nlive nm b i -> nlive (nmem_add nm p sz) b i.
 Proof.
-  intros. inversion H; subst. unfold nmem_add; destruct p; try (apply nlive_all).
+  intros. inversion H; subst b0 ofs nm. unfold nmem_add; destruct p; try (apply nlive_all).
 - destruct gl!id as [iv|] eqn:NG.
   + split; simpl; intros. auto.
     rewrite PTree.gsspec in H1. destruct (peq id0 id); eauto. inv H1.
@@ -1273,7 +1273,7 @@ Lemma nlive_remove:
   b' <> b \/ i < Ptrofs.unsigned ofs \/ Ptrofs.unsigned ofs + sz <= i ->
   nlive (nmem_remove nm p sz) b' i.
 Proof.
-  intros. inversion H2; subst. unfold nmem_remove; inv H1; auto.
+  intros. inversion H2; subst b0 ofs0 nm. unfold nmem_remove; inv H1; auto.
 - set (iv' := match gl!id with | Some iv => ISet.add (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) iv | None => ISet.interval (Ptrofs.unsigned ofs) (Ptrofs.unsigned ofs + sz) end).
   assert (Genv.find_symbol ge id = Some b) by (eapply H; eauto).
   split; simpl; auto; intros.
@@ -1360,7 +1360,7 @@ Definition nmem_lub (nm1 nm2: nmem) : nmem :=
 Lemma nlive_lub_l:
   forall nm1 nm2 b i, nlive nm1 b i -> nlive (nmem_lub nm1 nm2) b i.
 Proof.
-  intros. inversion H; subst. destruct nm2; simpl. auto.
+  intros. inversion H; subst b0 ofs nm1. destruct nm2; simpl. auto.
   constructor; simpl; intros.
 - rewrite ISet.In_inter. intros [P Q]. eelim STK; eauto.
 - rewrite PTree.gcombine in H1 by auto.
@@ -1372,7 +1372,7 @@ Qed.
 Lemma nlive_lub_r:
   forall nm1 nm2 b i, nlive nm2 b i -> nlive (nmem_lub nm1 nm2) b i.
 Proof.
-  intros. inversion H; subst. destruct nm1; simpl. auto.
+  intros. inversion H; subst b0 ofs nm2. destruct nm1; simpl. auto.
   constructor; simpl; intros.
 - rewrite ISet.In_inter. intros [P Q]. eelim STK; eauto.
 - rewrite PTree.gcombine in H1 by auto.

@@ -1163,13 +1163,13 @@ Module LEq <: SEMILATTICE.
 
   Lemma eq_sym: forall x y, eq x y -> eq y x.
   Proof.
-    unfold eq; intros; destruct x; destruct y; auto.
+    unfold eq; intros; destruct x as [e|e]; destruct y as [e0|e0]; auto.
     red in H; red; intros. rewrite H; tauto.
   Qed.
 
   Lemma eq_trans: forall x y z, eq x y -> eq y z -> eq x z.
   Proof.
-    unfold eq; intros. destruct x; destruct y; try contradiction; destruct z; auto.
+    unfold eq; intros. destruct x as [e|e]; destruct y as [e0|e0]; try contradiction; destruct z as [e1|e1]; auto.
     red in H; red in H0; red; intros. rewrite H. auto.
   Qed.
 
@@ -1182,7 +1182,7 @@ Module LEq <: SEMILATTICE.
 
   Lemma beq_correct: forall x y, beq x y = true -> eq x y.
   Proof.
-    unfold beq, eq; intros. destruct x; destruct y.
+    unfold beq, eq; intros. destruct x as [e|e]; destruct y as [e0|e0].
     apply EqSet.equal_2. auto.
     discriminate.
     discriminate.
@@ -1199,13 +1199,13 @@ Module LEq <: SEMILATTICE.
   Lemma ge_refl: forall x y, eq x y -> ge x y.
   Proof.
     unfold eq, ge, EqSet.Equal, EqSet.Subset; intros.
-    destruct x; destruct y; auto. intros; rewrite H; auto.
+    destruct x as [e|e]; destruct y as [e0|e0]; auto. intros; rewrite H; auto.
   Qed.
   Lemma ge_trans: forall x y z, ge x y -> ge y z -> ge x z.
   Proof.
     unfold ge, EqSet.Subset; intros.
-    destruct x; auto; destruct y; try contradiction.
-    destruct z; eauto.
+    destruct x as [e|e]; auto; destruct y as [e0|e0]; try contradiction.
+    destruct z as [e1|e1]; eauto.
   Qed.
 
   Definition bot: t := OK empty_eqs.
