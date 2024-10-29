@@ -473,7 +473,24 @@ Module OrderedEquation' <: OrderedType.
   Proof. unfold eq. auto. Qed.
   Lemma eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z.
   Proof. unfold eq. intros. rewrite H. auto. Qed.
+  Lemma eq_trans2 : forall x y z : t, eq x y -> eq y z -> eq x z.
+  Proof. unfold eq. intros. rewrite H. auto. Qed.
   Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z.
+  Proof.
+    unfold lt; intros.
+    destruct H.
+    destruct H0. left; eapply OrderedLoc.lt_trans; eauto.
+    destruct H0. rewrite <- H0. auto.
+    destruct H. rewrite H.
+    destruct H0. auto.
+    destruct H0. right; split; auto.
+    intuition.
+    left; eapply Plt_trans; eauto.
+    left; congruence.
+    left; congruence.
+    right; split. congruence. eapply OrderedEqKind.lt_trans; eauto.
+  Qed.
+  Lemma lt_trans2 : forall x y z : t, lt x y -> lt y z -> lt x z.
   Proof.
     unfold lt; intros.
     destruct H.
@@ -495,7 +512,29 @@ Module OrderedEquation' <: OrderedType.
     eelim Plt_strict; eauto.
     eelim OrderedEqKind.lt_not_eq; eauto. red; auto.
   Qed.
+  Lemma lt_not_eq2 : forall x y : t, lt x y -> ~ eq x y.
+  Proof.
+    unfold lt, eq; intros; red; intros. subst y. intuition.
+    eelim OrderedLoc.lt_not_eq; eauto. red; auto.
+    eelim Plt_strict; eauto.
+    eelim OrderedEqKind.lt_not_eq; eauto. red; auto.
+  Qed.
   Definition compare : forall x y : t, Compare lt eq x y.
+  Proof.
+    intros.
+    destruct (OrderedLoc.compare (eloc x) (eloc y)).
+  - apply LT. red; auto.
+  - destruct (OrderedPositive.compare (ereg x) (ereg y)).
+    + apply LT. red; auto.
+    + destruct (OrderedEqKind.compare (ekind x) (ekind y)).
+      * apply LT. red; auto.
+      * apply EQ. red in e; red in e0; red in e1; red.
+        destruct x; destruct y; simpl in *; congruence.
+      * apply GT. red; auto.
+   + apply GT. red; auto.
+  - apply GT. red; auto.
+  Defined.
+  Definition compare2 : forall x y : t, Compare lt eq x y.
   Proof.
     intros.
     destruct (OrderedLoc.compare (eloc x) (eloc y)).
@@ -1191,13 +1230,30 @@ Module LEq <: SEMILATTICE.
     intros; destruct x; simpl; auto. red; tauto.
   Qed.
 
+  Lemma eq_refl2: forall x, eq x x.
+  Proof.
+    intros; destruct x; simpl; auto. red; tauto.
+  Qed.
+
   Lemma eq_sym: forall x y, eq x y -> eq y x.
   Proof.
     unfold eq; intros; destruct x as [e|e]; destruct y as [e0|e0]; auto.
     red in H; red; intros. rewrite H; tauto.
   Qed.
 
+  Lemma eq_sym2: forall x y, eq x y -> eq y x.
+  Proof.
+    unfold eq; intros; destruct x as [e|e]; destruct y as [e0|e0]; auto.
+    red in H; red; intros. rewrite H; tauto.
+  Qed.
+
   Lemma eq_trans: forall x y z, eq x y -> eq y z -> eq x z.
+  Proof.
+    unfold eq; intros. destruct x as [e|e]; destruct y as [e0|e0]; try contradiction; destruct z as [e1|e1]; auto.
+    red in H; red in H0; red; intros. rewrite H. auto.
+  Qed.
+
+  Lemma eq_trans3: forall x y z, eq x y -> eq y z -> eq x z.
   Proof.
     unfold eq; intros. destruct x as [e|e]; destruct y as [e0|e0]; try contradiction; destruct z as [e1|e1]; auto.
     red in H; red in H0; red; intros. rewrite H. auto.

@@ -13,44 +13,59 @@
                 ]
             },
             {
-                "tactic_sig": "destruct x as [  | | ] .",
-                "tactic_sig_no_out_arg": "destruct x .",
+                "tactic_sig": "intros _o _o .",
+                "tactic_sig_no_out_arg": "intros x y .",
                 "tactic_args": [
                     "c1_goal : forall (x y : t) (_ : eq (index x) (index y)), eq x y"
                 ],
                 "tactic_res": [
-                    "c2_goal : forall (y : t) (_ : eq (index Full) (index y)), eq Full y",
-                    "c3_goal : forall (y : t) (_ : eq (index Low) (index y)), eq Low y",
-                    "c4_goal : forall (y : t) (_ : eq (index High) (index y)), eq High y"
+                    "c2_goal : forall _ : eq (index x) (index y), eq x y",
+                    "c2_x : True",
+                    "c2_y : True"
                 ]
             },
             {
-                "tactic_sig": "destruct y as [  | | ] .",
-                "tactic_sig_no_out_arg": "destruct y .",
+                "tactic_sig": "destruct _i as [  | | ] .",
+                "tactic_sig_no_out_arg": "destruct _i .",
                 "tactic_args": [
-                    "c2_goal : forall (y : t) (_ : eq (index Full) (index y)), eq Full y"
+                    "c2_goal : forall _ : eq (index x) (index y), eq x y",
+                    "c2_x : True",
+                    "c2_y : True"
                 ],
                 "tactic_res": [
-                    "c5_goal : forall _ : eq (index Full) (index Full), eq Full Full",
-                    "c6_goal : forall _ : eq (index Full) (index Low), eq Full Low",
-                    "c7_goal : forall _ : eq (index Full) (index High), eq Full High"
+                    "c3_goal : forall _ : eq (index Full) (index y), eq Full y",
+                    "c4_goal : forall _ : eq (index Low) (index y), eq Low y",
+                    "c5_goal : forall _ : eq (index High) (index y), eq High y"
+                ]
+            },
+            {
+                "tactic_sig": "destruct _i as [  | | ] .",
+                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_args": [
+                    "c3_goal : forall _ : eq (index Full) (index y), eq Full y",
+                    "c2_y : True"
+                ],
+                "tactic_res": [
+                    "c6_goal : forall _ : eq (index Full) (index Full), eq Full Full",
+                    "c7_goal : forall _ : eq (index Full) (index Low), eq Full Low",
+                    "c8_goal : forall _ : eq (index Full) (index High), eq Full High"
                 ]
             },
             {
                 "tactic_sig": "simpl .",
                 "tactic_sig_no_out_arg": "simpl .",
                 "tactic_args": [
-                    "c5_goal : forall _ : eq (index Full) (index Full), eq Full Full"
+                    "c6_goal : forall _ : eq (index Full) (index Full), eq Full Full"
                 ],
                 "tactic_res": [
-                    "c8_goal : forall _ : eq 1%positive 1%positive, eq Full Full"
+                    "c9_goal : forall _ : eq xH xH, eq Full Full"
                 ]
             },
             {
                 "tactic_sig": "congruence .",
                 "tactic_sig_no_out_arg": "congruence .",
                 "tactic_args": [
-                    "c8_goal : forall _ : eq 1%positive 1%positive, eq Full Full"
+                    "c9_goal : forall _ : eq xH xH, eq Full Full"
                 ],
                 "tactic_res": []
             },
@@ -58,17 +73,17 @@
                 "tactic_sig": "simpl .",
                 "tactic_sig_no_out_arg": "simpl .",
                 "tactic_args": [
-                    "c6_goal : forall _ : eq (index Full) (index Low), eq Full Low"
+                    "c7_goal : forall _ : eq (index Full) (index Low), eq Full Low"
                 ],
                 "tactic_res": [
-                    "c9_goal : forall _ : eq 1%positive 2%positive, eq Full Low"
+                    "c10_goal : forall _ : eq xH (xO xH), eq Full Low"
                 ]
             },
             {
                 "tactic_sig": "congruence .",
                 "tactic_sig_no_out_arg": "congruence .",
                 "tactic_args": [
-                    "c9_goal : forall _ : eq 1%positive 2%positive, eq Full Low"
+                    "c10_goal : forall _ : eq xH (xO xH), eq Full Low"
                 ],
                 "tactic_res": []
             },
@@ -76,65 +91,48 @@
                 "tactic_sig": "simpl .",
                 "tactic_sig_no_out_arg": "simpl .",
                 "tactic_args": [
-                    "c7_goal : forall _ : eq (index Full) (index High), eq Full High"
+                    "c8_goal : forall _ : eq (index Full) (index High), eq Full High"
                 ],
                 "tactic_res": [
-                    "c10_goal : forall _ : eq 1%positive 3%positive, eq Full High"
+                    "c11_goal : forall _ : eq xH (xI xH), eq Full High"
                 ]
             },
             {
                 "tactic_sig": "congruence .",
                 "tactic_sig_no_out_arg": "congruence .",
                 "tactic_args": [
-                    "c10_goal : forall _ : eq 1%positive 3%positive, eq Full High"
+                    "c11_goal : forall _ : eq xH (xI xH), eq Full High"
                 ],
                 "tactic_res": []
             },
             {
-                "tactic_sig": "destruct y as [  | | ] .",
-                "tactic_sig_no_out_arg": "destruct y .",
+                "tactic_sig": "destruct _i as [  | | ] .",
+                "tactic_sig_no_out_arg": "destruct _i .",
                 "tactic_args": [
-                    "c3_goal : forall (y : t) (_ : eq (index Low) (index y)), eq Low y"
+                    "c4_goal : forall _ : eq (index Low) (index y), eq Low y",
+                    "c2_y : True"
                 ],
                 "tactic_res": [
-                    "c11_goal : forall _ : eq (index Low) (index Full), eq Low Full",
-                    "c12_goal : forall _ : eq (index Low) (index Low), eq Low Low",
-                    "c13_goal : forall _ : eq (index Low) (index High), eq Low High"
+                    "c12_goal : forall _ : eq (index Low) (index Full), eq Low Full",
+                    "c13_goal : forall _ : eq (index Low) (index Low), eq Low Low",
+                    "c14_goal : forall _ : eq (index Low) (index High), eq Low High"
                 ]
             },
             {
                 "tactic_sig": "simpl .",
                 "tactic_sig_no_out_arg": "simpl .",
                 "tactic_args": [
-                    "c11_goal : forall _ : eq (index Low) (index Full), eq Low Full"
+                    "c12_goal : forall _ : eq (index Low) (index Full), eq Low Full"
                 ],
                 "tactic_res": [
-                    "c14_goal : forall _ : eq 2%positive 1%positive, eq Low Full"
+                    "c15_goal : forall _ : eq (xO xH) xH, eq Low Full"
                 ]
             },
             {
                 "tactic_sig": "congruence .",
                 "tactic_sig_no_out_arg": "congruence .",
                 "tactic_args": [
-                    "c14_goal : forall _ : eq 2%positive 1%positive, eq Low Full"
-                ],
-                "tactic_res": []
-            },
-            {
-                "tactic_sig": "simpl .",
-                "tactic_sig_no_out_arg": "simpl .",
-                "tactic_args": [
-                    "c12_goal : forall _ : eq (index Low) (index Low), eq Low Low"
-                ],
-                "tactic_res": [
-                    "c15_goal : forall _ : eq 2%positive 2%positive, eq Low Low"
-                ]
-            },
-            {
-                "tactic_sig": "congruence .",
-                "tactic_sig_no_out_arg": "congruence .",
-                "tactic_args": [
-                    "c15_goal : forall _ : eq 2%positive 2%positive, eq Low Low"
+                    "c15_goal : forall _ : eq (xO xH) xH, eq Low Full"
                 ],
                 "tactic_res": []
             },
@@ -142,47 +140,17 @@
                 "tactic_sig": "simpl .",
                 "tactic_sig_no_out_arg": "simpl .",
                 "tactic_args": [
-                    "c13_goal : forall _ : eq (index Low) (index High), eq Low High"
+                    "c13_goal : forall _ : eq (index Low) (index Low), eq Low Low"
                 ],
                 "tactic_res": [
-                    "c16_goal : forall _ : eq 2%positive 3%positive, eq Low High"
+                    "c16_goal : forall _ : eq (xO xH) (xO xH), eq Low Low"
                 ]
             },
             {
                 "tactic_sig": "congruence .",
                 "tactic_sig_no_out_arg": "congruence .",
                 "tactic_args": [
-                    "c16_goal : forall _ : eq 2%positive 3%positive, eq Low High"
-                ],
-                "tactic_res": []
-            },
-            {
-                "tactic_sig": "destruct y as [  | | ] .",
-                "tactic_sig_no_out_arg": "destruct y .",
-                "tactic_args": [
-                    "c4_goal : forall (y : t) (_ : eq (index High) (index y)), eq High y"
-                ],
-                "tactic_res": [
-                    "c17_goal : forall _ : eq (index High) (index Full), eq High Full",
-                    "c18_goal : forall _ : eq (index High) (index Low), eq High Low",
-                    "c19_goal : forall _ : eq (index High) (index High), eq High High"
-                ]
-            },
-            {
-                "tactic_sig": "simpl .",
-                "tactic_sig_no_out_arg": "simpl .",
-                "tactic_args": [
-                    "c17_goal : forall _ : eq (index High) (index Full), eq High Full"
-                ],
-                "tactic_res": [
-                    "c20_goal : forall _ : eq 3%positive 1%positive, eq High Full"
-                ]
-            },
-            {
-                "tactic_sig": "congruence .",
-                "tactic_sig_no_out_arg": "congruence .",
-                "tactic_args": [
-                    "c20_goal : forall _ : eq 3%positive 1%positive, eq High Full"
+                    "c16_goal : forall _ : eq (xO xH) (xO xH), eq Low Low"
                 ],
                 "tactic_res": []
             },
@@ -190,17 +158,48 @@
                 "tactic_sig": "simpl .",
                 "tactic_sig_no_out_arg": "simpl .",
                 "tactic_args": [
-                    "c18_goal : forall _ : eq (index High) (index Low), eq High Low"
+                    "c14_goal : forall _ : eq (index Low) (index High), eq Low High"
                 ],
                 "tactic_res": [
-                    "c21_goal : forall _ : eq 3%positive 2%positive, eq High Low"
+                    "c17_goal : forall _ : eq (xO xH) (xI xH), eq Low High"
                 ]
             },
             {
                 "tactic_sig": "congruence .",
                 "tactic_sig_no_out_arg": "congruence .",
                 "tactic_args": [
-                    "c21_goal : forall _ : eq 3%positive 2%positive, eq High Low"
+                    "c17_goal : forall _ : eq (xO xH) (xI xH), eq Low High"
+                ],
+                "tactic_res": []
+            },
+            {
+                "tactic_sig": "destruct _i as [  | | ] .",
+                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_args": [
+                    "c5_goal : forall _ : eq (index High) (index y), eq High y",
+                    "c2_y : True"
+                ],
+                "tactic_res": [
+                    "c18_goal : forall _ : eq (index High) (index Full), eq High Full",
+                    "c19_goal : forall _ : eq (index High) (index Low), eq High Low",
+                    "c20_goal : forall _ : eq (index High) (index High), eq High High"
+                ]
+            },
+            {
+                "tactic_sig": "simpl .",
+                "tactic_sig_no_out_arg": "simpl .",
+                "tactic_args": [
+                    "c18_goal : forall _ : eq (index High) (index Full), eq High Full"
+                ],
+                "tactic_res": [
+                    "c21_goal : forall _ : eq (xI xH) xH, eq High Full"
+                ]
+            },
+            {
+                "tactic_sig": "congruence .",
+                "tactic_sig_no_out_arg": "congruence .",
+                "tactic_args": [
+                    "c21_goal : forall _ : eq (xI xH) xH, eq High Full"
                 ],
                 "tactic_res": []
             },
@@ -208,17 +207,35 @@
                 "tactic_sig": "simpl .",
                 "tactic_sig_no_out_arg": "simpl .",
                 "tactic_args": [
-                    "c19_goal : forall _ : eq (index High) (index High), eq High High"
+                    "c19_goal : forall _ : eq (index High) (index Low), eq High Low"
                 ],
                 "tactic_res": [
-                    "c22_goal : forall _ : eq 3%positive 3%positive, eq High High"
+                    "c22_goal : forall _ : eq (xI xH) (xO xH), eq High Low"
                 ]
             },
             {
                 "tactic_sig": "congruence .",
                 "tactic_sig_no_out_arg": "congruence .",
                 "tactic_args": [
-                    "c22_goal : forall _ : eq 3%positive 3%positive, eq High High"
+                    "c22_goal : forall _ : eq (xI xH) (xO xH), eq High Low"
+                ],
+                "tactic_res": []
+            },
+            {
+                "tactic_sig": "simpl .",
+                "tactic_sig_no_out_arg": "simpl .",
+                "tactic_args": [
+                    "c20_goal : forall _ : eq (index High) (index High), eq High High"
+                ],
+                "tactic_res": [
+                    "c23_goal : forall _ : eq (xI xH) (xI xH), eq High High"
+                ]
+            },
+            {
+                "tactic_sig": "congruence .",
+                "tactic_sig_no_out_arg": "congruence .",
+                "tactic_args": [
+                    "c23_goal : forall _ : eq (xI xH) (xI xH), eq High High"
                 ],
                 "tactic_res": []
             }
@@ -1432,79 +1449,11 @@
         ]
     },
     {
-        "lemma_name": "eq_refl",
+        "lemma_name": "eq_trans2",
         "proof": [
             {
-                "tactic_sig": "Lemma eq_refl : forall x : t , eq x x .",
-                "tactic_sig_no_out_arg": "Lemma eq_refl : forall x : t , eq x x .",
-                "tactic_args": [
-                    "c0_goal : "
-                ],
-                "tactic_res": [
-                    "c1_goal : forall x : t, eq x x"
-                ]
-            },
-            {
-                "tactic_sig": "unfold _i .",
-                "tactic_sig_no_out_arg": "unfold _i .",
-                "tactic_args": [
-                    "c1_goal : forall x : t, eq x x",
-                    "_global_eq : forall (_ : t) (_ : t), Prop"
-                ],
-                "tactic_res": [
-                    "c2_goal : forall x : t, Logic.eq x x"
-                ]
-            },
-            {
-                "tactic_sig": "auto .",
-                "tactic_sig_no_out_arg": "auto .",
-                "tactic_args": [
-                    "c2_goal : forall x : t, Logic.eq x x"
-                ],
-                "tactic_res": []
-            }
-        ]
-    },
-    {
-        "lemma_name": "eq_sym",
-        "proof": [
-            {
-                "tactic_sig": "Lemma eq_sym : forall x y : t , eq x y -> eq y x .",
-                "tactic_sig_no_out_arg": "Lemma eq_sym : forall x y : t , eq x y -> eq y x .",
-                "tactic_args": [
-                    "c0_goal : "
-                ],
-                "tactic_res": [
-                    "c1_goal : forall (x y : t) (_ : eq x y), eq y x"
-                ]
-            },
-            {
-                "tactic_sig": "unfold _i .",
-                "tactic_sig_no_out_arg": "unfold _i .",
-                "tactic_args": [
-                    "c1_goal : forall (x y : t) (_ : eq x y), eq y x",
-                    "_global_eq : forall (_ : t) (_ : t), Prop"
-                ],
-                "tactic_res": [
-                    "c2_goal : forall (x y : t) (_ : Logic.eq x y), Logic.eq y x"
-                ]
-            },
-            {
-                "tactic_sig": "auto .",
-                "tactic_sig_no_out_arg": "auto .",
-                "tactic_args": [
-                    "c2_goal : forall (x y : t) (_ : Logic.eq x y), Logic.eq y x"
-                ],
-                "tactic_res": []
-            }
-        ]
-    },
-    {
-        "lemma_name": "eq_trans",
-        "proof": [
-            {
-                "tactic_sig": "Lemma eq_trans : forall x y z : t , eq x y -> eq y z -> eq x z .",
-                "tactic_sig_no_out_arg": "Lemma eq_trans : forall x y z : t , eq x y -> eq y z -> eq x z .",
+                "tactic_sig": "Lemma eq_trans2 : forall x y z : t , eq x y -> eq y z -> eq x z .",
+                "tactic_sig_no_out_arg": "Lemma eq_trans2 : forall x y z : t , eq x y -> eq y z -> eq x z .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
@@ -1563,11 +1512,11 @@
         ]
     },
     {
-        "lemma_name": "lt_trans",
+        "lemma_name": "lt_trans2",
         "proof": [
             {
-                "tactic_sig": "Lemma lt_trans : forall x y z : t , lt x y -> lt y z -> lt x z .",
-                "tactic_sig_no_out_arg": "Lemma lt_trans : forall x y z : t , lt x y -> lt y z -> lt x z .",
+                "tactic_sig": "Lemma lt_trans2 : forall x y z : t , lt x y -> lt y z -> lt x z .",
+                "tactic_sig_no_out_arg": "Lemma lt_trans2 : forall x y z : t , lt x y -> lt y z -> lt x z .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
@@ -1994,11 +1943,11 @@
         ]
     },
     {
-        "lemma_name": "lt_not_eq",
+        "lemma_name": "lt_not_eq2",
         "proof": [
             {
-                "tactic_sig": "Lemma lt_not_eq : forall x y : t , lt x y -> ~ eq x y .",
-                "tactic_sig_no_out_arg": "Lemma lt_not_eq : forall x y : t , lt x y -> ~ eq x y .",
+                "tactic_sig": "Lemma lt_not_eq2 : forall x y : t , lt x y -> ~ eq x y .",
+                "tactic_sig_no_out_arg": "Lemma lt_not_eq2 : forall x y : t , lt x y -> ~ eq x y .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
@@ -2182,11 +2131,11 @@
         ]
     },
     {
-        "lemma_name": "compare",
+        "lemma_name": "compare2",
         "proof": [
             {
-                "tactic_sig": "Definition compare : forall x y : t , Compare lt eq x y .",
-                "tactic_sig_no_out_arg": "Definition compare : forall x y : t , Compare lt eq x y .",
+                "tactic_sig": "Definition compare2 : forall x y : t , Compare lt eq x y .",
+                "tactic_sig_no_out_arg": "Definition compare2 : forall x y : t , Compare lt eq x y .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
@@ -2564,17 +2513,17 @@
         ]
     },
     {
-        "lemma_name": null,
+        "lemma_name": "empty_eqs_dup",
         "proof": [
             {
-                "tactic_sig": "Next Obligation .",
-                "tactic_sig_no_out_arg": "Next Obligation .",
+                "tactic_sig": "Lemma empty_eqs_dup q : EqSet2.In q EqSet2.empty <-> EqSet.In q EqSet.empty .",
+                "tactic_sig_no_out_arg": "Lemma empty_eqs_dup q : EqSet2.In q EqSet2.empty <-> EqSet.In q EqSet.empty .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
                 "tactic_res": [
                     "c1_goal : iff (EqSet2.In q EqSet2.empty) (EqSet.In q EqSet.empty)",
-                    "c1_q : EqSet2.elt"
+                    "c1_q : EqSet2\\.elt"
                 ]
             },
             {
@@ -2651,17 +2600,17 @@
         ]
     },
     {
-        "lemma_name": null,
+        "lemma_name": "add_equation_dup",
         "proof": [
             {
-                "tactic_sig": "Next Obligation .",
-                "tactic_sig_no_out_arg": "Next Obligation .",
+                "tactic_sig": "Lemma add_equation_dup ( q : equation ) ( e : eqs ) q0 : EqSet2.In q0 ( EqSet2.add q ( eqs2 e ) ) <-> EqSet.In q0 ( EqSet.add q e ) .",
+                "tactic_sig_no_out_arg": "Lemma add_equation_dup ( q : equation ) ( e : eqs ) q0 : EqSet2.In q0 ( EqSet2.add q ( eqs2 e ) ) <-> EqSet.In q0 ( EqSet.add q e ) .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
                 "tactic_res": [
                     "c1_goal : iff (EqSet2.In q0 (EqSet2.add q (eqs2 e)))\n  (EqSet.In q0 (EqSet.add q e))",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_e : eqs",
                     "c1_q : equation"
                 ]
@@ -2705,7 +2654,7 @@
                 "tactic_args": [
                     "c4_goal : EqSet.In q0 (EqSet.add q e)",
                     "c1_q : equation",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c4_H : EqSet2.In q0 (EqSet2.add q (eqs2 e))",
                     "c1_e : eqs"
                 ],
@@ -2733,7 +2682,7 @@
                 "tactic_args": [
                     "c8_goal : eq q q0",
                     "c6_e0 : eq q q0",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -2780,7 +2729,7 @@
                 "tactic_args": [
                     "c11_goal : not (eq q q0)",
                     "c7_n : not (eq q q0)",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -2791,7 +2740,7 @@
                 "tactic_args": [
                     "c12_goal : EqSet2.In q0 (EqSet2.add q (eqs2 e))",
                     "c4_H : EqSet2.In q0 (EqSet2.add q (eqs2 e))",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_e : eqs",
                     "c1_q : equation"
                 ],
@@ -2803,7 +2752,7 @@
                 "tactic_args": [
                     "c5_goal : EqSet2.In q0 (EqSet2.add q (eqs2 e))",
                     "c1_q : equation",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c5_H : EqSet.In q0 (EqSet.add q e)",
                     "c1_e : eqs"
                 ],
@@ -2831,7 +2780,7 @@
                 "tactic_args": [
                     "c15_goal : eq q q0",
                     "c13_e0 : eq q q0",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -2878,7 +2827,7 @@
                 "tactic_args": [
                     "c18_goal : not (eq q q0)",
                     "c14_n : not (eq q q0)",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -2889,7 +2838,7 @@
                 "tactic_args": [
                     "c19_goal : EqSet.In q0 (EqSet.add q e)",
                     "c5_H : EqSet.In q0 (EqSet.add q e)",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_e : eqs",
                     "c1_q : equation"
                 ],
@@ -2898,17 +2847,17 @@
         ]
     },
     {
-        "lemma_name": null,
+        "lemma_name": "remove_equation_dup",
         "proof": [
             {
-                "tactic_sig": "Next Obligation .",
-                "tactic_sig_no_out_arg": "Next Obligation .",
+                "tactic_sig": "Lemma remove_equation_dup ( q : equation ) ( e : eqs ) q0 : EqSet2.In q0 ( EqSet2.remove q ( eqs2 e ) ) <-> EqSet.In q0 ( EqSet.remove q e ) .",
+                "tactic_sig_no_out_arg": "Lemma remove_equation_dup ( q : equation ) ( e : eqs ) q0 : EqSet2.In q0 ( EqSet2.remove q ( eqs2 e ) ) <-> EqSet.In q0 ( EqSet.remove q e ) .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
                 "tactic_res": [
                     "c1_goal : iff (EqSet2.In q0 (EqSet2.remove q (eqs2 e)))\n  (EqSet.In q0 (EqSet.remove q e))",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_e : eqs",
                     "c1_q : equation"
                 ]
@@ -2952,7 +2901,7 @@
                 "tactic_args": [
                     "c4_goal : EqSet.In q0 (EqSet.remove q e)",
                     "c1_q : equation",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c4_H : EqSet2.In q0 (EqSet2.remove q (eqs2 e))",
                     "c1_e : eqs"
                 ],
@@ -2988,7 +2937,7 @@
                 "tactic_args": [
                     "c9_goal : EqSet2.In q0 (EqSet2.remove q ?s)",
                     "c4_H : EqSet2.In q0 (EqSet2.remove q (eqs2 e))",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -3011,7 +2960,7 @@
                 "tactic_args": [
                     "c10_goal : not (eq q q0)",
                     "c7_n : not (eq q q0)",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -3046,7 +2995,7 @@
                 "tactic_args": [
                     "c13_goal : EqSet2.In q0 (EqSet2.remove q (eqs2 e))",
                     "c4_H : EqSet2.In q0 (EqSet2.remove q (eqs2 e))",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_e : eqs",
                     "c1_q : equation"
                 ],
@@ -3058,7 +3007,7 @@
                 "tactic_args": [
                     "c5_goal : EqSet2.In q0 (EqSet2.remove q (eqs2 e))",
                     "c1_q : equation",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c5_H : EqSet.In q0 (EqSet.remove q e)",
                     "c1_e : eqs"
                 ],
@@ -3094,7 +3043,7 @@
                 "tactic_args": [
                     "c17_goal : EqSet.In q0 (EqSet.remove q ?s)",
                     "c5_H : EqSet.In q0 (EqSet.remove q e)",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -3117,7 +3066,7 @@
                 "tactic_args": [
                     "c18_goal : not (eq q q0)",
                     "c15_n : not (eq q q0)",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_q : equation"
                 ],
                 "tactic_res": []
@@ -3152,7 +3101,7 @@
                 "tactic_args": [
                     "c21_goal : EqSet.In q0 (EqSet.remove q e)",
                     "c5_H : EqSet.In q0 (EqSet.remove q e)",
-                    "c1_q0 : EqSet2.elt",
+                    "c1_q0 : EqSet2\\.elt",
                     "c1_e : eqs",
                     "c1_q : equation"
                 ],
@@ -3161,11 +3110,11 @@
         ]
     },
     {
-        "lemma_name": "eq_refl",
+        "lemma_name": "eq_refl2",
         "proof": [
             {
-                "tactic_sig": "Lemma eq_refl : forall x , eq x x .",
-                "tactic_sig_no_out_arg": "Lemma eq_refl : forall x , eq x x .",
+                "tactic_sig": "Lemma eq_refl2 : forall x , eq x x .",
+                "tactic_sig_no_out_arg": "Lemma eq_refl2 : forall x , eq x x .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
@@ -3247,11 +3196,11 @@
         ]
     },
     {
-        "lemma_name": "eq_sym",
+        "lemma_name": "eq_sym2",
         "proof": [
             {
-                "tactic_sig": "Lemma eq_sym : forall x y , eq x y -> eq y x .",
-                "tactic_sig_no_out_arg": "Lemma eq_sym : forall x y , eq x y -> eq y x .",
+                "tactic_sig": "Lemma eq_sym2 : forall x y , eq x y -> eq y x .",
+                "tactic_sig_no_out_arg": "Lemma eq_sym2 : forall x y , eq x y -> eq y x .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
@@ -3284,8 +3233,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e|e ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e|e ] .",
                 "tactic_args": [
                     "c3_goal : match y with\n| OK a => match x with\n          | OK b => EqSet.Equal a b\n          | Error _ => False\n          end\n| Error _ => match x with\n             | OK _ => False\n             | Error _ => True\n             end\nend",
                     "c3_x : True",
@@ -3302,8 +3251,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c4_goal : match y with\n| OK a => EqSet.Equal a e\n| Error _ => False\nend",
                     "c3_y : True",
@@ -3329,8 +3278,8 @@
                 "tactic_res": []
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c5_goal : match y with\n| OK _ => False\n| Error _ => True\nend",
                     "c3_y : True",
@@ -3391,7 +3340,7 @@
                 ],
                 "tactic_res": [
                     "c11_goal : iff (EqSet.In a e0) (EqSet.In a e)",
-                    "c11_a : EqSet.elt"
+                    "c11_a : EqSet\\.elt"
                 ]
             },
             {
@@ -3416,11 +3365,11 @@
         ]
     },
     {
-        "lemma_name": "eq_trans",
+        "lemma_name": "eq_trans3",
         "proof": [
             {
-                "tactic_sig": "Lemma eq_trans : forall x y z , eq x y -> eq y z -> eq x z .",
-                "tactic_sig_no_out_arg": "Lemma eq_trans : forall x y z , eq x y -> eq y z -> eq x z .",
+                "tactic_sig": "Lemma eq_trans3 : forall x y z , eq x y -> eq y z -> eq x z .",
+                "tactic_sig_no_out_arg": "Lemma eq_trans3 : forall x y z , eq x y -> eq y z -> eq x z .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
@@ -3455,8 +3404,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e|e ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e|e ] .",
                 "tactic_args": [
                     "c3_goal : match x with\n| OK a => match z with\n          | OK b => EqSet.Equal a b\n          | Error _ => False\n          end\n| Error _ => match z with\n             | OK _ => False\n             | Error _ => True\n             end\nend",
                     "c3_x : True",
@@ -3474,8 +3423,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o _o | _o _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c4_goal : match z with\n| OK b => EqSet.Equal e b\n| Error _ => False\nend",
                     "c3_y : True",
@@ -3496,8 +3445,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e1|e1 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e1|e1 ] .",
                 "tactic_args": [
                     "c6_goal : match z with\n| OK b => EqSet.Equal e b\n| Error _ => False\nend",
                     "c3_z : True",
@@ -3532,8 +3481,8 @@
                 "tactic_res": []
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o _o | _o _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c5_goal : match z with\n| OK _ => False\n| Error _ => True\nend",
                     "c3_y : True",
@@ -3562,8 +3511,8 @@
                 "tactic_res": []
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e1|e1 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e1|e1 ] .",
                 "tactic_args": [
                     "c11_goal : match z with\n| OK _ => False\n| Error _ => True\nend",
                     "c3_z : True",
@@ -3636,7 +3585,7 @@
                 ],
                 "tactic_res": [
                     "c15_goal : iff (EqSet.In a e) (EqSet.In a e1)",
-                    "c15_a : EqSet.elt"
+                    "c15_a : EqSet\\.elt"
                 ]
             },
             {
@@ -3655,7 +3604,7 @@
                 "tactic_sig_no_out_arg": "auto .",
                 "tactic_args": [
                     "c16_goal : iff (EqSet.In a e0) (EqSet.In a e1)",
-                    "c15_a : EqSet.elt",
+                    "c15_a : EqSet\\.elt",
                     "c8_H0 : forall a : EqSet.elt, iff (EqSet.In a e0) (EqSet.In a e1)",
                     "c6_e0 : eqs",
                     "c8_e1 : eqs"
@@ -3703,8 +3652,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e|e ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e|e ] .",
                 "tactic_args": [
                     "c3_goal : match x with\n| OK a => match y with\n          | OK b => EqSet.Equal a b\n          | Error _ => False\n          end\n| Error _ => match y with\n             | OK _ => False\n             | Error _ => True\n             end\nend",
                     "c3_x : True",
@@ -3721,8 +3670,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c4_goal : match y with\n| OK b => EqSet.Equal e b\n| Error _ => False\nend",
                     "c3_y : True",
@@ -3739,8 +3688,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c5_goal : match y with\n| OK _ => False\n| Error _ => True\nend",
                     "c3_y : True",
@@ -3845,8 +3794,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e|e ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e|e ] .",
                 "tactic_args": [
                     "c3_goal : match x with\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c3_x : True",
@@ -3863,8 +3812,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c4_goal : match y with\n| OK b => forall (a : EqSet.elt) (_ : EqSet.In a b), EqSet.In a e\n| Error _ => False\nend",
                     "c3_y : True",
@@ -3890,8 +3839,8 @@
                 "tactic_res": []
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c5_goal : True",
                     "c3_y : True",
@@ -3931,7 +3880,7 @@
                 ],
                 "tactic_res": [
                     "c10_goal : EqSet.In a e",
-                    "c10_a : EqSet.elt",
+                    "c10_a : EqSet\\.elt",
                     "c10_H0 : EqSet.In a e0"
                 ]
             },
@@ -3952,7 +3901,7 @@
                 "tactic_args": [
                     "c11_goal : EqSet.In a e0",
                     "c10_H0 : EqSet.In a e0",
-                    "c10_a : EqSet.elt",
+                    "c10_a : EqSet\\.elt",
                     "c6_e0 : eqs"
                 ],
                 "tactic_res": []
@@ -4000,8 +3949,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e|e ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e|e ] .",
                 "tactic_args": [
                     "c3_goal : match x with\n| OK a =>\n    match z with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c3_x : True",
@@ -4019,8 +3968,8 @@
                 ]
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o _o | _o _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e0|e0 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e0|e0 ] .",
                 "tactic_args": [
                     "c4_goal : match z with\n| OK b => forall (a : EqSet.elt) (_ : EqSet.In a b), EqSet.In a e\n| Error _ => False\nend",
                     "c3_y : True",
@@ -4057,8 +4006,8 @@
                 "tactic_res": []
             },
             {
-                "tactic_sig": "destruct _i as [  _o _o | _o _o ] .",
-                "tactic_sig_no_out_arg": "destruct _i .",
+                "tactic_sig": "destruct _i as [ e1|e1 ] .",
+                "tactic_sig_no_out_arg": "destruct _i as [ e1|e1 ] .",
                 "tactic_args": [
                     "c6_goal : match z with\n| OK b => forall (a : EqSet.elt) (_ : EqSet.In a b), EqSet.In a e\n| Error _ => False\nend",
                     "c3_z : True",
@@ -4175,7 +4124,7 @@
                 ],
                 "tactic_res": [
                     "c7_goal : EqSet.In a e",
-                    "c7_a : EqSet.elt",
+                    "c7_a : EqSet\\.elt",
                     "c7_H : EqSet.In a EqSet.empty"
                 ]
             },
@@ -4191,17 +4140,17 @@
         ]
     },
     {
-        "lemma_name": null,
+        "lemma_name": "lub_dup",
         "proof": [
             {
-                "tactic_sig": "Next Obligation .",
-                "tactic_sig_no_out_arg": "Next Obligation .",
+                "tactic_sig": "Lemma lub_dup ( x y : t ) ( a b : eqs ) q : EqSet2.In q ( EqSet2.union ( eqs2 a ) ( eqs2 b ) ) <-> EqSet.In q ( EqSet.union a b ) .",
+                "tactic_sig_no_out_arg": "Lemma lub_dup ( x y : t ) ( a b : eqs ) q : EqSet2.In q ( EqSet2.union ( eqs2 a ) ( eqs2 b ) ) <-> EqSet.In q ( EqSet.union a b ) .",
                 "tactic_args": [
                     "c0_goal : "
                 ],
                 "tactic_res": [
                     "c1_goal : iff (EqSet2.In q (EqSet2.union (eqs2 a) (eqs2 b)))\n  (EqSet.In q (EqSet.union a b))",
-                    "c1_q : EqSet2.elt",
+                    "c1_q : EqSet2\\.elt",
                     "c1_b : eqs",
                     "c1_a : eqs",
                     "c1_y : True",
@@ -4258,7 +4207,7 @@
                 "tactic_args": [
                     "c4_goal : EqSet.In q (EqSet.union a b)",
                     "c4_H : or (EqSet2.In q (eqs2 a)) (EqSet2.In q (eqs2 b))",
-                    "c1_q : EqSet2.elt",
+                    "c1_q : EqSet2\\.elt",
                     "c1_a : eqs",
                     "c1_b : eqs",
                     "c1_x : True",
@@ -4310,7 +4259,7 @@
                 "tactic_args": [
                     "c8_goal : EqSet.In q a",
                     "c6_H : EqSet.In q a",
-                    "c1_q : EqSet2.elt",
+                    "c1_q : EqSet2\\.elt",
                     "c1_a : eqs"
                 ],
                 "tactic_res": []
@@ -4332,7 +4281,7 @@
                 "tactic_args": [
                     "c9_goal : EqSet.In q b",
                     "c7_H : EqSet.In q b",
-                    "c1_q : EqSet2.elt",
+                    "c1_q : EqSet2\\.elt",
                     "c1_b : eqs"
                 ],
                 "tactic_res": []
@@ -4354,7 +4303,7 @@
                 "tactic_args": [
                     "c5_goal : EqSet2.In q (EqSet2.union (eqs2 a) (eqs2 b))",
                     "c5_H : or (EqSet.In q a) (EqSet.In q b)",
-                    "c1_q : EqSet2.elt",
+                    "c1_q : EqSet2\\.elt",
                     "c1_a : eqs",
                     "c1_b : eqs",
                     "c1_x : True",
@@ -4406,7 +4355,7 @@
                 "tactic_args": [
                     "c12_goal : EqSet2.In q (eqs2 a)",
                     "c10_H : EqSet2.In q (eqs2 a)",
-                    "c1_q : EqSet2.elt",
+                    "c1_q : EqSet2\\.elt",
                     "c1_a : eqs"
                 ],
                 "tactic_res": []
@@ -4428,7 +4377,7 @@
                 "tactic_args": [
                     "c13_goal : EqSet2.In q (eqs2 b)",
                     "c11_H : EqSet2.In q (eqs2 b)",
-                    "c1_q : EqSet2.elt",
+                    "c1_q : EqSet2\\.elt",
                     "c1_b : eqs"
                 ],
                 "tactic_res": []
@@ -4458,17 +4407,17 @@
                     "_global_EqSet.Subset : forall (_ : EqSet.t) (_ : EqSet.t), Prop"
                 ],
                 "tactic_res": [
-                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
+                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
                 ]
             },
             {
                 "tactic_sig": "intros _o _o .",
                 "tactic_sig_no_out_arg": "intros .",
                 "tactic_args": [
-                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
+                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
                 ],
                 "tactic_res": [
-                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
+                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c3_x : True",
                     "c3_y : True"
                 ]
@@ -4477,12 +4426,12 @@
                 "tactic_sig": "destruct _i as [  _o | _o ] .",
                 "tactic_sig_no_out_arg": "destruct _i .",
                 "tactic_args": [
-                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
+                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match x with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c3_x : True",
                     "c3_y : True"
                 ],
                 "tactic_res": [
-                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n          eqs1 := EqSet.union e b;\n          eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n          eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q\n        |}\n  | Error _ => y\n  end\nwith\n| OK a => forall (a0 : EqSet.elt) (_ : EqSet.In a0 e), EqSet.In a0 a\n| Error _ => True\nend",
+                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n        eqs1 := EqSet.union e b;\n        eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n        eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q |}\n  | Error _ => y\n  end\nwith\n| OK a => forall (a0 : EqSet.elt) (_ : EqSet.In a0 e), EqSet.In a0 a\n| Error _ => True\nend",
                     "c4_e : eqs",
                     "c5_goal : True",
                     "c5_e : errmsg"
@@ -4492,12 +4441,12 @@
                 "tactic_sig": "destruct _i as [  _o | _o ] .",
                 "tactic_sig_no_out_arg": "destruct _i .",
                 "tactic_args": [
-                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n          eqs1 := EqSet.union e b;\n          eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n          eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q\n        |}\n  | Error _ => y\n  end\nwith\n| OK a => forall (a0 : EqSet.elt) (_ : EqSet.In a0 e), EqSet.In a0 a\n| Error _ => True\nend",
+                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n        eqs1 := EqSet.union e b;\n        eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n        eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q |}\n  | Error _ => y\n  end\nwith\n| OK a => forall (a0 : EqSet.elt) (_ : EqSet.In a0 e), EqSet.In a0 a\n| Error _ => True\nend",
                     "c3_y : True",
                     "c4_e : eqs"
                 ],
                 "tactic_res": [
-                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e),\nEqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}",
+                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e),\nEqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}",
                     "c6_e0 : eqs",
                     "c7_goal : True",
                     "c7_e0 : errmsg"
@@ -4546,11 +4495,11 @@
                 "tactic_sig": "intros _o _o .",
                 "tactic_sig_no_out_arg": "intros .",
                 "tactic_args": [
-                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e),\nEqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}"
+                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e),\nEqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}"
                 ],
                 "tactic_res": [
-                    "c10_goal : EqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}",
-                    "c10_a : EqSet.elt",
+                    "c10_goal : EqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}",
+                    "c10_a : EqSet\\.elt",
                     "c10_H : EqSet.In a e"
                 ]
             },
@@ -4558,7 +4507,7 @@
                 "tactic_sig": "apply _i .",
                 "tactic_sig_no_out_arg": "apply _i .",
                 "tactic_args": [
-                    "c10_goal : EqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}",
+                    "c10_goal : EqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}",
                     "_global_EqSet.union_2 : forall (s s' : EqSet.t) (x : EqSet.elt) (_ : EqSet.In x s),\n       EqSet.In x (EqSet.union s s')"
                 ],
                 "tactic_res": [
@@ -4571,7 +4520,7 @@
                 "tactic_args": [
                     "c11_goal : EqSet.In a e",
                     "c10_H : EqSet.In a e",
-                    "c10_a : EqSet.elt",
+                    "c10_a : EqSet\\.elt",
                     "c4_e : eqs"
                 ],
                 "tactic_res": []
@@ -4601,17 +4550,17 @@
                     "_global_EqSet.Subset : forall (_ : EqSet.t) (_ : EqSet.t), Prop"
                 ],
                 "tactic_res": [
-                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
+                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
                 ]
             },
             {
                 "tactic_sig": "intros _o _o .",
                 "tactic_sig_no_out_arg": "intros .",
                 "tactic_args": [
-                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
+                    "c2_goal : forall x y : t,\nmatch\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend"
                 ],
                 "tactic_res": [
-                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
+                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c3_x : True",
                     "c3_y : True"
                 ]
@@ -4620,12 +4569,12 @@
                 "tactic_sig": "destruct _i as [  _o | _o ] .",
                 "tactic_sig_no_out_arg": "destruct _i .",
                 "tactic_args": [
-                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n              eqs1 := EqSet.union a b;\n              eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n              eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q\n            |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
+                    "c3_goal : match\n  match x with\n  | OK a =>\n      match y with\n      | OK b =>\n          OK\n            {|\n            eqs1 := EqSet.union a b;\n            eqs2 := EqSet2.union (eqs2 a) (eqs2 b);\n            eqs_same := fun q : EqSet2.elt => lub_obligation_1 a b q |}\n      | Error _ => y\n      end\n  | Error _ => x\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c3_x : True",
                     "c3_y : True"
                 ],
                 "tactic_res": [
-                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n          eqs1 := EqSet.union e b;\n          eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n          eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q\n        |}\n  | Error _ => y\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
+                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n        eqs1 := EqSet.union e b;\n        eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n        eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q |}\n  | Error _ => y\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c4_e : eqs",
                     "c5_goal : True",
                     "c5_e : errmsg"
@@ -4635,12 +4584,12 @@
                 "tactic_sig": "destruct _i as [  _o | _o ] .",
                 "tactic_sig_no_out_arg": "destruct _i .",
                 "tactic_args": [
-                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n          eqs1 := EqSet.union e b;\n          eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n          eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q\n        |}\n  | Error _ => y\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
+                    "c4_goal : match\n  match y with\n  | OK b =>\n      OK\n        {|\n        eqs1 := EqSet.union e b;\n        eqs2 := EqSet2.union (eqs2 e) (eqs2 b);\n        eqs_same := fun q : EqSet2.elt => lub_obligation_1 e b q |}\n  | Error _ => y\n  end\nwith\n| OK a =>\n    match y with\n    | OK b =>\n        forall (a0 : EqSet.elt) (_ : EqSet.In a0 b), EqSet.In a0 a\n    | Error _ => False\n    end\n| Error _ => True\nend",
                     "c3_y : True",
                     "c4_e : eqs"
                 ],
                 "tactic_res": [
-                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e0),\nEqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}",
+                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e0),\nEqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}",
                     "c6_e0 : eqs",
                     "c7_goal : True",
                     "c7_e0 : errmsg"
@@ -4689,11 +4638,11 @@
                 "tactic_sig": "intros _o _o .",
                 "tactic_sig_no_out_arg": "intros .",
                 "tactic_args": [
-                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e0),\nEqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}"
+                    "c6_goal : forall (a : EqSet.elt) (_ : EqSet.In a e0),\nEqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}"
                 ],
                 "tactic_res": [
-                    "c10_goal : EqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}",
-                    "c10_a : EqSet.elt",
+                    "c10_goal : EqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}",
+                    "c10_a : EqSet\\.elt",
                     "c10_H : EqSet.In a e0"
                 ]
             },
@@ -4701,7 +4650,7 @@
                 "tactic_sig": "apply _i .",
                 "tactic_sig_no_out_arg": "apply _i .",
                 "tactic_args": [
-                    "c10_goal : EqSet.In a\n  {|\n    eqs1 := EqSet.union e e0;\n    eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n    eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q\n  |}",
+                    "c10_goal : EqSet.In a\n  {|\n  eqs1 := EqSet.union e e0;\n  eqs2 := EqSet2.union (eqs2 e) (eqs2 e0);\n  eqs_same := fun q : EqSet2.elt => lub_obligation_1 e e0 q |}",
                     "_global_EqSet.union_3 : forall (s s' : EqSet.t) (x : EqSet.elt) (_ : EqSet.In x s'),\n       EqSet.In x (EqSet.union s s')"
                 ],
                 "tactic_res": [
@@ -4714,7 +4663,7 @@
                 "tactic_args": [
                     "c11_goal : EqSet.In a e0",
                     "c10_H : EqSet.In a e0",
-                    "c10_a : EqSet.elt",
+                    "c10_a : EqSet\\.elt",
                     "c6_e0 : eqs"
                 ],
                 "tactic_res": []

@@ -586,7 +586,8 @@ Lemma rolm_sound:
 Proof.
   unfold rolm; intros.
   assert (X: forall u, Val.rolm u amount mask = Val.and (Val.rol u (Vint amount)) (Vint mask)).
-  { destruct u; auto. }
+  - destruct u; auto.
+  -
   rewrite ! X.
   apply andimm_sound. apply rol_sound. auto.
 Qed.
@@ -1447,6 +1448,12 @@ Module NA <: SEMILATTICE.
     apply NE.beq_correct; auto.
     intros. apply nmem_beq_sound; auto.
   Qed.
+  Lemma beq_correct2: forall x y, beq x y = true -> eq x y.
+  Proof.
+    intros x y. unfold beq, eq; destruct x, y; simpl; intros. InvBooleans. split.
+    apply NE.beq_correct; auto.
+    intros. apply nmem_beq_sound; auto.
+  Qed.
 
   Definition ge (x y: t) : Prop :=
     NE.ge (fst x) (fst y) /\
@@ -1458,7 +1465,20 @@ Module NA <: SEMILATTICE.
     apply NE.ge_refl; auto.
     intros. apply B; auto.
   Qed.
+  Lemma ge_refl2: forall x y, eq x y -> ge x y.
+  Proof.
+    intros x y. unfold eq, ge; destruct x, y; simpl. intros [A B]; split.
+    apply NE.ge_refl; auto.
+    intros. apply B; auto.
+  Qed.
+
   Lemma ge_trans: forall x y z, ge x y -> ge y z -> ge x z.
+  Proof.
+    intros x y z. unfold ge; destruct x, y, z; simpl. intros [A B] [C D]; split.
+    eapply NE.ge_trans; eauto.
+    auto.
+  Qed.
+  Lemma ge_trans2: forall x y z, ge x y -> ge y z -> ge x z.
   Proof.
     intros x y z. unfold ge; destruct x, y, z; simpl. intros [A B] [C D]; split.
     eapply NE.ge_trans; eauto.
@@ -1468,6 +1488,12 @@ Module NA <: SEMILATTICE.
   Definition bot : t := (NE.bot, NMemDead).
 
   Lemma ge_bot: forall x, ge x bot.
+  Proof.
+    intro x. unfold ge, bot; destruct x; simpl. split.
+    apply NE.ge_bot.
+    intros. inv H.
+  Qed.
+  Lemma ge_bot2: forall x, ge x bot.
   Proof.
     intro x. unfold ge, bot; destruct x; simpl. split.
     apply NE.ge_bot.
@@ -1483,7 +1509,21 @@ Module NA <: SEMILATTICE.
     apply NE.ge_lub_left.
     intros; apply nlive_lub_l; auto.
   Qed.
+
+  Lemma ge_lub_left2: forall x y, ge (lub x y) x.
+  Proof.
+    intros x y. unfold ge; destruct x, y; simpl; split.
+    apply NE.ge_lub_left.
+    intros; apply nlive_lub_l; auto.
+  Qed.
+
   Lemma ge_lub_right: forall x y, ge (lub x y) y.
+  Proof.
+    intros x y. unfold ge; destruct x, y; simpl; split.
+    apply NE.ge_lub_right.
+    intros; apply nlive_lub_r; auto.
+  Qed.
+  Lemma ge_lub_right2: forall x y, ge (lub x y) y.
   Proof.
     intros x y. unfold ge; destruct x, y; simpl; split.
     apply NE.ge_lub_right.
