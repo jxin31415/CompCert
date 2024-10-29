@@ -90,7 +90,7 @@ Inductive vagree_list: list val -> list val -> list nval -> Prop :=
 Lemma lessdef_vagree_list:
   forall vl1 vl2, vagree_list vl1 vl2 nil -> Val.lessdef_list vl1 vl2.
 Proof.
-  induction vl1; intros; inv H; constructor; auto with na.
+  intro vl1. induction vl1; intros; inv H; constructor; auto with na.
 Qed.
 
 Lemma vagree_lessdef_list:
@@ -114,7 +114,7 @@ Inductive nge: nval -> nval -> Prop :=
 
 Lemma nge_refl: forall x, nge x x.
 Proof.
-  destruct x; constructor; auto.
+  intro x. destruct x; constructor; auto.
 Qed.
 
 Global Hint Constructors nge: na.
@@ -144,14 +144,14 @@ Definition nlub (x y: nval) : nval :=
 Lemma nge_lub_l:
   forall x y, nge (nlub x y) x.
 Proof.
-  unfold nlub; destruct x, y; auto with na.
+  intros x y. unfold nlub; destruct x, y; auto with na.
   constructor. intros. autorewrite with ints; auto. rewrite H0; auto.
 Qed.
 
 Lemma nge_lub_r:
   forall x y, nge (nlub x y) y.
 Proof.
-  unfold nlub; destruct x, y; auto with na.
+  intros x y. unfold nlub; destruct x, y; auto with na.
   constructor. intros. autorewrite with ints; auto. rewrite H0. apply orb_true_r; auto.
 Qed.
 
@@ -629,7 +629,7 @@ Qed.
 
 Remark modarith_idem: forall nv, modarith (modarith nv) = modarith nv.
 Proof.
-  destruct nv; simpl; auto. f_equal; apply complete_mask_idem.
+  intro nv. destruct nv; simpl; auto. f_equal; apply complete_mask_idem.
 Qed.
 
 Lemma mul_sound:
@@ -1423,17 +1423,17 @@ Module NA <: SEMILATTICE.
 
   Lemma eq_refl: forall x, eq x x.
   Proof.
-    unfold eq; destruct x; simpl; split. apply NE.eq_refl. tauto.
+    intro x. unfold eq; destruct x; simpl; split. apply NE.eq_refl. tauto.
   Qed.
   Lemma eq_sym: forall x y, eq x y -> eq y x.
   Proof.
-    unfold eq; destruct x, y; simpl. intros [A B].
+    intros x y. unfold eq; destruct x, y; simpl. intros [A B].
     split. apply NE.eq_sym; auto.
     intros. rewrite B. tauto.
   Qed.
   Lemma eq_trans: forall x y z, eq x y -> eq y z -> eq x z.
   Proof.
-    unfold eq; destruct x, y, z; simpl. intros [A B] [C D]; split.
+    intros x y z. unfold eq; destruct x, y, z; simpl. intros [A B] [C D]; split.
     eapply NE.eq_trans; eauto.
     intros. rewrite B; auto.
   Qed.
@@ -1443,7 +1443,7 @@ Module NA <: SEMILATTICE.
 
   Lemma beq_correct: forall x y, beq x y = true -> eq x y.
   Proof.
-    unfold beq, eq; destruct x, y; simpl; intros. InvBooleans. split.
+    intros x y. unfold beq, eq; destruct x, y; simpl; intros. InvBooleans. split.
     apply NE.beq_correct; auto.
     intros. apply nmem_beq_sound; auto.
   Qed.
@@ -1454,13 +1454,13 @@ Module NA <: SEMILATTICE.
 
   Lemma ge_refl: forall x y, eq x y -> ge x y.
   Proof.
-    unfold eq, ge; destruct x, y; simpl. intros [A B]; split.
+    intros x y. unfold eq, ge; destruct x, y; simpl. intros [A B]; split.
     apply NE.ge_refl; auto.
     intros. apply B; auto.
   Qed.
   Lemma ge_trans: forall x y z, ge x y -> ge y z -> ge x z.
   Proof.
-    unfold ge; destruct x, y, z; simpl. intros [A B] [C D]; split.
+    intros x y z. unfold ge; destruct x, y, z; simpl. intros [A B] [C D]; split.
     eapply NE.ge_trans; eauto.
     auto.
   Qed.
@@ -1469,7 +1469,7 @@ Module NA <: SEMILATTICE.
 
   Lemma ge_bot: forall x, ge x bot.
   Proof.
-    unfold ge, bot; destruct x; simpl. split.
+    intro x. unfold ge, bot; destruct x; simpl. split.
     apply NE.ge_bot.
     intros. inv H.
   Qed.
@@ -1479,13 +1479,13 @@ Module NA <: SEMILATTICE.
 
   Lemma ge_lub_left: forall x y, ge (lub x y) x.
   Proof.
-    unfold ge; destruct x, y; simpl; split.
+    intros x y. unfold ge; destruct x, y; simpl; split.
     apply NE.ge_lub_left.
     intros; apply nlive_lub_l; auto.
   Qed.
   Lemma ge_lub_right: forall x y, ge (lub x y) y.
   Proof.
-    unfold ge; destruct x, y; simpl; split.
+    intros x y. unfold ge; destruct x, y; simpl; split.
     apply NE.ge_lub_right.
     intros; apply nlive_lub_r; auto.
   Qed.

@@ -392,7 +392,7 @@ Lemma add_vars_valid:
   map_valid map1 s1 ->
   regs_valid rl s2 /\ map_valid map2 s2.
 Proof.
-  induction namel; simpl; intros; monadInv H.
+  intro namel. induction namel; simpl; intros; monadInv H.
   split. red; simpl; intros; tauto. auto.
   exploit IHnamel; eauto. intros [A B].
   exploit add_var_valid; eauto. intros [C D].
@@ -413,7 +413,7 @@ Lemma add_vars_letenv:
   add_vars map1 il s1 = OK (rl, map2) s2 i ->
   map2.(map_letvars) = map1.(map_letvars).
 Proof.
-  induction il; simpl; intros; monadInv H.
+  intro il. induction il; simpl; intros; monadInv H.
   reflexivity.
   transitivity (map_letvars x0).
   eapply add_var_letenv; eauto.
@@ -465,7 +465,7 @@ Lemma alloc_regs_valid:
   alloc_regs map al s1 = OK rl s2 i ->
   regs_valid rl s2.
 Proof.
-  induction al; simpl; intros; monadInv H0.
+  intro al. induction al; simpl; intros; monadInv H0.
   apply regs_valid_nil.
   apply regs_valid_cons. eauto with rtlg. eauto with rtlg.
 Qed.
@@ -477,7 +477,7 @@ Lemma alloc_regs_fresh_or_in_map:
   alloc_regs map al s = OK rl s' i ->
   forall r, In r rl -> reg_in_map map r \/ reg_fresh r s.
 Proof.
-  induction al; simpl; intros; monadInv H0.
+  intros map al. induction al; simpl; intros; monadInv H0.
   elim H1.
   elim H1; intro.
   subst r.
@@ -599,7 +599,7 @@ Lemma alloc_regs_target_ok:
   alloc_regs map al s1 = OK rl s2 i ->
   target_regs_ok map pr al rl.
 Proof.
-  induction al; intros; monadInv H1.
+  intros map al. induction al; intros; monadInv H1.
   constructor.
   constructor.
   eapply alloc_reg_target_ok; eauto.
@@ -998,7 +998,7 @@ with transl_condexpr_charact:
    tr_condition s'.(st_code) map pr a ns ntrue nfalse.
 
 Proof.
-  induction a; intros; try (monadInv TR); saturateTrans.
+  intro a. induction a; intros; try (monadInv TR); saturateTrans.
   generalize EQ; unfold find_var. caseEq (map_vars map)!i; intros; inv EQ1.
   econstructor; eauto.
   inv OK. left; split; congruence. right; eauto with rtlg.
@@ -1072,7 +1072,7 @@ Lemma transl_expr_assign_charact:
      (OK: reg_map_ok map rd (Some id)),
    tr_expr s'.(st_code) map nil a ns nd rd (Some id).
 Proof.
-  induction a; intros; monadInv TR; saturateTrans.
+  intros id a. induction a; intros; monadInv TR; saturateTrans.
   generalize EQ; unfold find_var. caseEq (map_vars map)!i; intros; inv EQ1.
   econstructor; eauto.
   eapply add_move_charact; eauto.
@@ -1151,7 +1151,7 @@ Lemma transl_jumptable_charact:
   transl_jumptable nexits tbl s = OK nl s' incr ->
   tr_jumptable nexits tbl nl /\ s' = s.
 Proof.
-  induction tbl; intros.
+  intros nexits tbl. induction tbl; intros.
   monadInv H. split. red. simpl. intros. discriminate. auto.
   monadInv H. exploit transl_exit_charact; eauto. intros [A B].
   exploit IHtbl; eauto. intros [C D].
@@ -1165,7 +1165,7 @@ Lemma transl_exitexpr_charact:
      (WF: map_valid map s),
   tr_exitexpr s'.(st_code) map a ns nexits.
 Proof.
-  induction a; simpl; intros; try (monadInv TR); saturateTrans.
+  intros nexits a. induction a; simpl; intros; try (monadInv TR); saturateTrans.
 - exploit transl_exit_charact; eauto. intros [A B].
   econstructor; eauto.
 - exploit transl_jumptable_charact; eauto. intros [A B].
@@ -1188,7 +1188,7 @@ Lemma convert_builtin_res_charact:
     (WF: map_valid map s),
   tr_builtin_res map res res'.
 Proof.
-  destruct res; simpl; intros.
+  intros map oty res. destruct res; simpl; intros.
 - monadInv TR. constructor.  unfold find_var in EQ. destruct (map_vars map)!x; inv EQ; auto.
 - destruct (xtype_eq oty Xvoid); monadInv TR.
 + constructor.
@@ -1203,7 +1203,7 @@ Lemma transl_stmt_charact:
     (OK: return_reg_ok s map rret),
   tr_stmt s'.(st_code) map stmt ns nd nexits ngoto nret rret.
 Proof.
-  induction stmt; intros; simpl in TR; try (monadInv TR); saturateTrans.
+  intros map stmt. induction stmt; intros; simpl in TR; try (monadInv TR); saturateTrans.
   constructor.
   revert EQ. unfold find_var. case_eq (map_vars map)!i; intros; monadInv EQ.
   eapply tr_Sassign; eauto.

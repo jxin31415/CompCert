@@ -39,7 +39,7 @@ Inductive match_code: code -> code -> Prop :=
 Remark diff_same:
   forall s, diff s s = nil.
 Proof.
-  induction s as [ | [v i] s]; simpl.
+  intro s. induction s as [ | [v i] s]; simpl.
   auto.
   rewrite Pos.compare_refl. rewrite dec_eq_true. auto.
 Qed.
@@ -47,13 +47,13 @@ Qed.
 Remark delta_state_same:
   forall s, delta_state s s = (nil, nil).
 Proof.
-  destruct s; simpl. rewrite ! diff_same; auto. auto.
+  intro s. destruct s; simpl. rewrite ! diff_same; auto. auto.
 Qed.
 
 Lemma transf_code_match:
   forall lm c before, match_code c (transf_code lm before c).
 Proof.
-  intros lm. fix REC 1. destruct c; intros before; simpl.
+  intros lm. fix REC 1. intros c. destruct c; intros before; simpl.
 - constructor.
 - assert (DEFAULT: forall before after, match_code (i :: c) (i :: add_delta_ranges before after (transf_code lm after c))).
   { intros. constructor. apply REC. }
@@ -128,7 +128,7 @@ Inductive wf_avail: avail -> Prop :=
 Lemma set_state_1:
   forall v i s, In (v, i) (set_state v i s).
 Proof.
-  induction s as [ | [v' i'] s]; simpl.
+  intros v i s. induction s as [ | [v' i'] s]; simpl.
 - auto.
 - destruct (Pos.compare v v'); simpl; auto.
 Qed.
@@ -137,7 +137,7 @@ Lemma set_state_2:
   forall v i v' i' s,
   v' <> v -> In (v', i') s -> In (v', i') (set_state v i s).
 Proof.
-  induction s as [ | [v1 i1] s]; simpl; intros.
+  intros v i v' i' s. induction s as [ | [v1 i1] s]; simpl; intros.
 - contradiction.
 - destruct (Pos.compare_spec v v1); simpl.
 + subst v1. destruct H0. congruence. auto.
@@ -197,7 +197,7 @@ Qed.
 Lemma remove_state_2:
   forall v v' i' s, v' <> v -> In (v', i') s -> In (v', i') (remove_state v s).
 Proof.
-  induction s as [ | [v1 i1] s]; simpl; intros.
+  intros v v' i' s. induction s as [ | [v1 i1] s]; simpl; intros.
 - auto.
 - destruct (Pos.compare_spec v v1); simpl.
 + subst v1. destruct H0. congruence. auto.
@@ -346,7 +346,7 @@ Lemma can_eval_safe_arg:
   forall (rs: locset) sp m (a: builtin_arg loc),
   safe_builtin_arg a -> exists v, eval_builtin_arg tge rs sp m a v.
 Proof.
-  induction a; simpl; intros; try contradiction;
+  intros rs sp m a. induction a; simpl; intros; try contradiction;
   try (econstructor; now eauto with barg).
   destruct H as [S1 S2].
   destruct (IHa1 S1) as [v1 E1]. destruct (IHa2 S2) as [v2 E2].

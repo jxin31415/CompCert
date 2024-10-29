@@ -388,7 +388,7 @@ Module IndexedEqKind <: INDEXED_TYPE.
   Definition index (x: t) :=
     match x with Full => 1%positive | Low => 2%positive | High => 3%positive end.
   Lemma index_inj: forall x y, index x = index y -> x = y.
-  Proof. destruct x; destruct y; simpl; congruence. Qed.
+  Proof. intros x y. destruct x; destruct y; simpl; congruence. Qed.
   Definition eq (x y: t) : {x=y} + {x<>y}.
   Proof. decide equality. Defined.
 End IndexedEqKind.
@@ -538,6 +538,11 @@ Next Obligation.
   split; intros. eelim EqSet2.empty_1; eauto. eelim EqSet.empty_1; eauto.
 Qed.
 
+Lemma empty_eqs_dup q : EqSet2.In q EqSet2.empty <-> EqSet.In q EqSet.empty.
+Proof. 
+split; intros. eelim EqSet2.empty_1; eauto. eelim EqSet.empty_1; eauto.
+Qed.
+
 (** Adding or removing an equation from a set. *)
 
 Program Definition add_equation (q: equation) (e: eqs) :=
@@ -552,6 +557,18 @@ Next Obligation.
   apply EqSet2.add_2. apply (eqs_same e). apply EqSet.add_3 with q; auto.
 Qed.
 
+Lemma add_equation_dup (q : equation) (e : eqs) q0 : 
+EqSet2.In q0 (EqSet2.add q (eqs2 e)) <-> EqSet.In q0 (EqSet.add q e).
+Proof. 
+split; intros.
+destruct (OrderedEquation'.eq_dec q q0).
+apply EqSet.add_1; auto.
+apply EqSet.add_2. apply (eqs_same e). apply EqSet2.add_3 with q; auto.
+destruct (OrderedEquation.eq_dec q q0).
+apply EqSet2.add_1; auto.
+apply EqSet2.add_2. apply (eqs_same e). apply EqSet.add_3 with q; auto.
+Qed.
+
 Program Definition remove_equation (q: equation) (e: eqs) :=
   mkeqs (EqSet.remove q (eqs1 e)) (EqSet2.remove q (eqs2 e)) _.
 Next Obligation.
@@ -562,6 +579,19 @@ Next Obligation.
   destruct (OrderedEquation.eq_dec q q0).
   eelim EqSet.remove_1; eauto.
   apply EqSet2.remove_2; auto. apply (eqs_same e). apply EqSet.remove_3 with q; auto.
+Qed.
+
+Lemma remove_equation_dup (q : equation) (e : eqs) q0 : 
+EqSet2.In q0 (EqSet2.remove q (eqs2 e)) <->
+EqSet.In q0 (EqSet.remove q e).
+Proof. 
+split; intros.
+destruct (OrderedEquation'.eq_dec q q0).
+eelim EqSet2.remove_1; eauto.
+apply EqSet.remove_2; auto. apply (eqs_same e). apply EqSet2.remove_3 with q; auto.
+destruct (OrderedEquation.eq_dec q q0).
+eelim EqSet.remove_1; eauto.
+apply EqSet2.remove_2; auto. apply (eqs_same e). apply EqSet.remove_3 with q; auto.
 Qed.
 
 (** [reg_unconstrained r e] is true if [e] contains no equations involving
@@ -1226,6 +1256,16 @@ Module LEq <: SEMILATTICE.
     end.
   Next Obligation.
     split; intros.
+    apply EqSet2.union_1 in H. destruct H; rewrite eqs_same in H.
+    apply EqSet.union_2; auto. apply EqSet.union_3; auto.
+    apply EqSet.union_1 in H. destruct H; rewrite <- eqs_same in H.
+    apply EqSet2.union_2; auto. apply EqSet2.union_3; auto.
+  Qed.
+
+  Lemma lub_dup (x y : t) (a b : eqs) q : EqSet2.In q (EqSet2.union (eqs2 a) (eqs2 b)) <->
+  EqSet.In q (EqSet.union a b).
+  Proof.
+  split; intros.
     apply EqSet2.union_1 in H. destruct H; rewrite eqs_same in H.
     apply EqSet.union_2; auto. apply EqSet.union_3; auto.
     apply EqSet.union_1 in H. destruct H; rewrite <- eqs_same in H.
