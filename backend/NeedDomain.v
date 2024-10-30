@@ -910,11 +910,11 @@ Proof.
   intros. assert (default nv = All) by (destruct nv; simpl; congruence).
   rewrite H2 in H0.
   assert (Val.lessdef_list args1 args2).
-  { destruct H0. auto with na.
+  - destruct H0. auto with na.
     destruct H0. inv H0; constructor; auto with na.
     destruct H0. inv H0. constructor. inv H8; constructor; auto with na. 
-    inv H0; constructor; auto with na. inv H8; constructor; auto with na. inv H9; constructor; auto with na. }
-  exploit (@eval_operation_inj _ _ _ _ ge ge inject_id).
+    inv H0; constructor; auto with na. inv H8; constructor; auto with na. inv H9; constructor; auto with na.
+  - exploit (@eval_operation_inj _ _ _ _ ge ge inject_id).
   eassumption. auto. auto. auto.
   instantiate (1 := op). intros. apply val_inject_lessdef; auto.
   apply val_inject_lessdef. instantiate (1 := Vptr sp Ptrofs.zero). instantiate (1 := Vptr sp Ptrofs.zero). auto.
@@ -985,9 +985,9 @@ Proof.
   unfold rolm_redundant; intros; InvBooleans. subst amount. rewrite Val.rolm_zero.
   apply andimm_redundant_sound; auto.
   assert (forall n, Int.ror n Int.zero = n).
-  { intros. rewrite Int.ror_rol_neg by apply int_wordsize_divides_modulus.
-    rewrite Int.neg_zero. apply Int.rol_zero. }
-  unfold rolm, rol, andimm in *. destruct x; auto.
+  - intros. rewrite Int.ror_rol_neg by apply int_wordsize_divides_modulus.
+    rewrite Int.neg_zero. apply Int.rol_zero.
+  - unfold rolm, rol, andimm in *. destruct x; auto.
   rewrite H in H0. auto.
   rewrite H in H0. auto.
 Qed.
