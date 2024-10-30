@@ -443,7 +443,7 @@ Module OrderedEquation <: OrderedType.
     + destruct (OrderedEqKind.compare (ekind x) (ekind y)).
       * apply LT. red; auto.
       * apply EQ. red in e; red in e0; red in e1; red.
-        destruct x; destruct y; simpl in *; congruence.
+        destruct x as [???]; destruct y as [???]; simpl in *; congruence.
       * apply GT. red; auto.
    + apply GT. red; auto.
   - apply GT. red; auto.
@@ -544,7 +544,7 @@ Module OrderedEquation' <: OrderedType.
     + destruct (OrderedEqKind.compare (ekind x) (ekind y)).
       * apply LT. red; auto.
       * apply EQ. red in e; red in e0; red in e1; red.
-        destruct x; destruct y; simpl in *; congruence.
+        destruct x as [???]; destruct y as [???]; simpl in *; congruence.
       * apply GT. red; auto.
    + apply GT. red; auto.
   - apply GT. red; auto.
