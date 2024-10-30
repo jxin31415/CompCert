@@ -1,0 +1,269 @@
+Lemma index_inj : forall x y, index x = index y -> x = y .
+Proof.
+   intros x y. destruct x as [  | | ]. 
+    - destruct y as [  | | ]. 
+      -- simpl. congruence.
+      -- simpl. congruence.
+      -- simpl. congruence.
+    - destruct y as [  | | ]. 
+      -- simpl. congruence.
+      -- simpl. congruence.
+      -- simpl. congruence.
+    - destruct y as [  | | ]. 
+      -- simpl. congruence.
+      -- simpl. congruence.
+      -- simpl. congruence.
+Qed.
+Lemma eq_refl : forall x : t, eq x x .
+Proof.
+   unfold eq. auto.
+Qed.
+Lemma eq_sym : forall x y : t, eq x y -> eq y x .
+Proof.
+   unfold eq. auto.
+Qed.
+Lemma eq_trans : forall x y z : t, eq x y -> eq y z -> eq x z .
+Proof.
+   unfold eq. intros x y z H H0. rewrite H. exact H0.
+Qed.
+Lemma lt_trans : forall x y z : t, lt x y -> lt y z -> lt x z .
+Proof.
+   unfold lt. intros x y z H H0. destruct H as [  H | H ]. 
+    - destruct H0 as [  H0 | H0 ]. 
+      -- left. eapply Plt_trans. 
+        --- eauto.
+        --- eauto.
+      -- destruct H0 as [  H1 H0 ]. rewrite <- H0. auto.
+    - destruct H as [  H1 H ]. rewrite H. destruct H0 as [  H0 | H0 ]. 
+      -- auto.
+      -- destruct H0 as [  H2 H0 ]. right. split. 
+        --- auto.
+        --- intuition. 
+          ---- left. eapply OrderedLoc.lt_trans. 
+            ----- eauto.
+            ----- eauto.
+          ---- left. congruence.
+          ---- left. congruence.
+          ---- right. split. 
+            ----- congruence.
+            ----- eapply OrderedEqKind.lt_trans. 
+              ------ eauto.
+              ------ eauto.
+Qed.
+Lemma lt_not_eq : forall x y : t, lt x y -> ~ eq x y .
+Proof.
+   unfold lt, eq. intros x y H. red. intros H0. subst y. intuition. 
+    - eelim Plt_strict. eauto.
+    - eelim OrderedLoc.lt_not_eq. 
+      -- eauto.
+      -- red. auto.
+    - eelim OrderedEqKind.lt_not_eq. 
+      -- eauto.
+      -- red. auto.
+Qed.
+Definition compare : forall x y : t, Compare lt eq x y .
+Proof.
+   intros x y. destruct ( OrderedPositive.compare ( ereg x ) ( ereg y ) ) as [  l | e | l ]. 
+    - apply LT. red. auto.
+    - destruct ( OrderedLoc.compare ( eloc x ) ( eloc y ) ) as [  l | e0 | l ]. 
+      -- apply LT. red. auto.
+      -- destruct ( OrderedEqKind.compare ( ekind x ) ( ekind y ) ) as [  l | e1 | l ]. 
+        --- apply LT. red. auto.
+        --- apply EQ. red. red in e. red in e0. red in e1. destruct x as [  e1 e0 e eloc0 ereg0 ekind0 ]. destruct y as [  e1 e0 e eloc1 ereg1 ekind1 ]. congruence.
+        --- apply GT. red. auto.
+      -- apply GT. red. auto.
+    - apply GT. red. auto.
+Qed.
+Definition eq_dec ( x y : t ) : { x = y } + { x <> y } .
+Proof.
+   decide equality. 
+    - apply Loc.eq.
+    - apply peq.
+    - apply IndexedEqKind.eq.
+Qed.
+Lemma eq_trans2 : forall x y z : t, eq x y -> eq y z -> eq x z .
+Proof.
+   unfold eq. intros x y z H H0. rewrite H. auto.
+Qed.
+Lemma lt_trans2 : forall x y z : t, lt x y -> lt y z -> lt x z .
+Proof.
+   unfold lt. intros x y z H H0. destruct H as [  H | H ]. 
+    - destruct H0 as [  H0 | H0 ]. 
+      -- left. eapply OrderedLoc.lt_trans. 
+        --- eauto.
+        --- eauto.
+      -- destruct H0 as [  H1 H0 ]. rewrite <- H0. auto.
+    - destruct H as [  H1 H ]. rewrite H. destruct H0 as [  H0 | H0 ]. 
+      -- auto.
+      -- destruct H0 as [  H2 H0 ]. right. split. 
+        --- auto.
+        --- intuition. 
+          ---- left. eapply Plt_trans. 
+            ----- eauto.
+            ----- eauto.
+          ---- left. congruence.
+          ---- left. congruence.
+          ---- right. split. 
+            ----- congruence.
+            ----- eapply OrderedEqKind.lt_trans. 
+              ------ eauto.
+              ------ eauto.
+Qed.
+Lemma lt_not_eq2 : forall x y : t, lt x y -> ~ eq x y .
+Proof.
+   unfold lt, eq. intros x y H. red. intros H0. subst y. intuition. 
+    - eelim OrderedLoc.lt_not_eq. 
+      -- eauto.
+      -- red. auto.
+    - eelim Plt_strict. eauto.
+    - eelim OrderedEqKind.lt_not_eq. 
+      -- eauto.
+      -- red. auto.
+Qed.
+Definition compare2 : forall x y : t, Compare lt eq x y .
+Proof.
+   intros x y. destruct ( OrderedLoc.compare ( eloc x ) ( eloc y ) ) as [  l | e | l ]. 
+    - apply LT. red. auto.
+    - destruct ( OrderedPositive.compare ( ereg x ) ( ereg y ) ) as [  l | e0 | l ]. 
+      -- apply LT. red. auto.
+      -- destruct ( OrderedEqKind.compare ( ekind x ) ( ekind y ) ) as [  l | e1 | l ]. 
+        --- apply LT. red. auto.
+        --- apply EQ. red. red in e. red in e0. red in e1. destruct x as [  e1 e0 e eloc0 ereg0 ekind0 ]. destruct y as [  e1 e0 e eloc1 ereg1 ekind1 ]. congruence.
+        --- apply GT. red. auto.
+      -- apply GT. red. auto.
+    - apply GT. red. auto.
+Qed.
+Lemma empty_eqs_dup q : EqSet2.In q EqSet2.empty <-> EqSet.In q EqSet.empty .
+Proof.
+   split. 
+    - intros H. eelim EqSet2.empty_1. eauto.
+    - intros H. eelim EqSet.empty_1. eauto.
+Qed.
+Lemma add_equation_dup ( q : equation ) ( e : eqs ) q0 : EqSet2.In q0 ( EqSet2.add q ( eqs2 e ) ) <-> EqSet.In q0 ( EqSet.add q e ) .
+Proof.
+   split. 
+    - intros H. destruct ( OrderedEquation'.eq_dec q q0 ) as [  e0 | n ]. 
+      -- apply EqSet.add_1. auto.
+      -- apply EqSet.add_2. apply ( eqs_same e ). apply EqSet2.add_3 with q. 
+        --- auto.
+        --- auto.
+    - intros H. destruct ( OrderedEquation.eq_dec q q0 ) as [  e0 | n ]. 
+      -- apply EqSet2.add_1. auto.
+      -- apply EqSet2.add_2. apply ( eqs_same e ). apply EqSet.add_3 with q. 
+        --- auto.
+        --- auto.
+Qed.
+Lemma remove_equation_dup ( q : equation ) ( e : eqs ) q0 : EqSet2.In q0 ( EqSet2.remove q ( eqs2 e ) ) <-> EqSet.In q0 ( EqSet.remove q e ) .
+Proof.
+   split. 
+    - intros H. destruct ( OrderedEquation'.eq_dec q q0 ) as [  e0 | n ]. 
+      -- eelim EqSet2.remove_1. 
+        --- eauto.
+        --- eauto.
+      -- apply EqSet.remove_2. 
+        --- auto.
+        --- apply ( eqs_same e ). apply EqSet2.remove_3 with q. auto.
+    - intros H. destruct ( OrderedEquation.eq_dec q q0 ) as [  e0 | n ]. 
+      -- eelim EqSet.remove_1. 
+        --- eauto.
+        --- eauto.
+      -- apply EqSet2.remove_2. 
+        --- auto.
+        --- apply ( eqs_same e ). apply EqSet.remove_3 with q. auto.
+Qed.
+Lemma eq_refl2 : forall x, eq x x .
+Proof.
+   intros x. destruct x as [  e | e ]. 
+    - simpl. red. tauto.
+    - simpl. auto.
+Qed.
+Lemma eq_sym2 : forall x y, eq x y -> eq y x .
+Proof.
+   unfold eq. intros x y H. destruct x as [ e|e ]. 
+    - destruct y as [ e0|e0 ]. 
+      -- red in H. red. intros a. rewrite H. tauto.
+      -- auto.
+    - destruct y as [ e0|e0 ]. 
+      -- auto.
+      -- auto.
+Qed.
+Lemma eq_trans3 : forall x y z, eq x y -> eq y z -> eq x z .
+Proof.
+   unfold eq. intros x y z H H0. destruct x as [ e|e ]. 
+    - destruct y as [ e0|e0 ]. 
+      -- destruct z as [ e1|e1 ]. 
+        --- red in H0. red. intros a. red in H. rewrite H. auto.
+        --- auto.
+      -- try contradiction.
+    - destruct y as [ e0|e0 ]. 
+      -- try contradiction.
+      -- destruct z as [ e1|e1 ]. 
+        --- auto.
+        --- auto.
+Qed.
+Lemma beq_correct : forall x y, beq x y = true -> eq x y .
+Proof.
+   unfold beq, eq. intros x y H. destruct x as [ e|e ]. 
+    - destruct y as [ e0|e0 ]. 
+      -- apply EqSet.equal_2. auto.
+      -- discriminate.
+    - destruct y as [ e0|e0 ]. 
+      -- discriminate.
+      -- auto.
+Qed.
+Lemma ge_refl : forall x y, eq x y -> ge x y .
+Proof.
+   unfold eq, ge, EqSet.Equal, EqSet.Subset. intros x y H. destruct x as [ e|e ]. 
+    - destruct y as [ e0|e0 ]. 
+      -- intros a H0. rewrite H. auto.
+      -- auto.
+    - destruct y as [ e0|e0 ]. 
+      -- auto.
+      -- auto.
+Qed.
+Lemma ge_trans : forall x y z, ge x y -> ge y z -> ge x z .
+Proof.
+   unfold ge, EqSet.Subset. intros x y z H H0. destruct x as [ e|e ]. 
+    - destruct y as [ e0|e0 ]. 
+      -- destruct z as [ e1|e1 ]. 
+        --- eauto.
+        --- eauto.
+      -- try contradiction.
+    - auto.
+Qed.
+Lemma ge_bot : forall x, ge x bot .
+Proof.
+   unfold ge, bot, EqSet.Subset. simpl. intros x. destruct x as [  e | e ]. 
+    - intros a H. elim ( EqSet.empty_1 H ).
+    - auto.
+Qed.
+Lemma lub_dup ( x y : t ) ( a b : eqs ) q : EqSet2.In q ( EqSet2.union ( eqs2 a ) ( eqs2 b ) ) <-> EqSet.In q ( EqSet.union a b ) .
+Proof.
+   split. 
+    - intros H. apply EqSet2.union_1 in H. destruct H as [  H | H ]. 
+      -- rewrite eqs_same in H. rewrite eqs_same in H. apply EqSet.union_2. auto.
+      -- apply EqSet.union_3. auto.
+    - intros H. apply EqSet.union_1 in H. destruct H as [  H | H ]. 
+      -- rewrite <- eqs_same in H. rewrite <- eqs_same in H. apply EqSet2.union_2. auto.
+      -- apply EqSet2.union_3. auto.
+Qed.
+Lemma ge_lub_left : forall x y, ge ( lub x y ) x .
+Proof.
+   unfold lub, ge, EqSet.Subset. intros x y. destruct x as [  e | e ]. 
+    - destruct y as [  e0 | e0 ]. 
+      -- intros a H. apply EqSet.union_2. auto.
+      -- auto.
+    - destruct y as [  e0 | e0 ]. 
+      -- auto.
+      -- auto.
+Qed.
+Lemma ge_lub_right : forall x y, ge ( lub x y ) y .
+Proof.
+   unfold lub, ge, EqSet.Subset. intros x y. destruct x as [  e | e ]. 
+    - destruct y as [  e0 | e0 ]. 
+      -- intros a H. apply EqSet.union_3. auto.
+      -- auto.
+    - destruct y as [  e0 | e0 ]. 
+      -- auto.
+      -- auto.
+Qed.
