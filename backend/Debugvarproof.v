@@ -56,7 +56,7 @@ Proof.
   intros lm. fix REC 1. intros c. destruct c; intros before; simpl.
 - constructor.
 - assert (DEFAULT: forall before after, match_code (i :: c) (i :: add_delta_ranges before after (transf_code lm after c))).
-  { intros. constructor. apply REC. }
+    intros. constructor. apply REC.
   destruct i; auto. destruct c; auto. destruct i; auto.
   set (after := get_label l0 lm).
   set (c1 := Llabel l0 :: add_delta_ranges before after (transf_code lm after c)).

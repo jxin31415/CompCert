@@ -280,7 +280,7 @@ Proof.
   generalize (Int.unsigned_range n); intros.
   set (j := if zlt (i + Int.unsigned n) Int.zwordsize then i + Int.unsigned n else Int.zwordsize - 1).
   assert (0 <= j < Int.zwordsize).
-  { unfold j; destruct (zlt (i + Int.unsigned n) Int.zwordsize); lia. }
+    unfold j; destruct (zlt (i + Int.unsigned n) Int.zwordsize); lia.  
   apply H; auto. autorewrite with ints; auto. apply orb_true_intro.
   unfold j; destruct (zlt (i + Int.unsigned n) Int.zwordsize).
 - left. rewrite zlt_false by lia.
@@ -328,7 +328,7 @@ Lemma eqmod_iagree:
 Proof.
   intros. set (p := Z.to_nat (Int.size m)).
   generalize (Int.size_range m); intros RANGE.
-  assert (EQ: Int.size m = Z.of_nat p). { symmetry; apply Z2Nat.id. lia. }
+  assert (EQ: Int.size m = Z.of_nat p).   symmetry; apply Z2Nat.id. lia.  
   rewrite EQ in H; rewrite <- two_power_nat_two_p in H.
   red; intros. rewrite ! Int.testbit_repr by auto.
   destruct (zlt i (Int.size m)).
@@ -346,7 +346,7 @@ Lemma iagree_eqmod:
 Proof.
   intros. set (p := Z.to_nat (Int.size m)).
   generalize (Int.size_range m); intros RANGE.
-  assert (EQ: Int.size m = Z.of_nat p). { symmetry; apply Z2Nat.id. lia. }
+  assert (EQ: Int.size m = Z.of_nat p).   symmetry; apply Z2Nat.id. lia.  
   rewrite EQ; rewrite <- two_power_nat_two_p.
   apply eqmod_same_bits. intros. apply H. lia.
   unfold complete_mask. rewrite Int.bits_zero_ext by lia.
@@ -359,9 +359,9 @@ Proof.
   unfold complete_mask; intros. destruct (Int.eq_dec m Int.zero).
 + subst m; reflexivity.
 + assert (Int.unsigned m <> 0).
-  { red; intros; elim n. rewrite <- (Int.repr_unsigned m). rewrite H; auto. }
+    red; intros; elim n. rewrite <- (Int.repr_unsigned m). rewrite H; auto.  
   assert (0 < Int.size m).
-  { apply Zsize_pos'. generalize (Int.unsigned_range m); lia. }
+    apply Zsize_pos'. generalize (Int.unsigned_range m); lia.  
   generalize (Int.size_range m); intros.
   f_equal. apply Int.bits_size_4. tauto.
   rewrite Int.bits_zero_ext by lia. rewrite zlt_true by lia.
@@ -702,7 +702,7 @@ Proof.
   red; intros. autorewrite with ints; try lia.
   set (j := if zlt i1 n then i1 else n - 1).
   assert (0 <= j < Int.zwordsize).
-  { unfold j; destruct (zlt i1 n); lia. }
+    unfold j; destruct (zlt i1 n); lia.  
   apply H; auto.
   autorewrite with ints; try lia. apply orb_true_intro.
   unfold j; destruct (zlt i1 n).
@@ -714,7 +714,7 @@ Proof.
   Int.bit_solve; try lia.
   set (j := if zlt i1 n then i1 else n - 1).
   assert (0 <= j < Int.zwordsize).
-  { unfold j; destruct (zlt i1 n); lia. }
+    unfold j; destruct (zlt i1 n); lia.  
   apply H; auto. rewrite Int.bits_zero_ext; try lia.
   rewrite zlt_true. apply Int.bits_mone; auto.
   unfold j. destruct (zlt i1 n); lia.
@@ -736,11 +736,11 @@ Lemma store_argument_sound:
 Proof.
   intros.
   assert (UNDEF: list_forall2 memval_lessdef (List.repeat Undef (size_chunk_nat chunk)) (encode_val chunk w)).
-  { rewrite <- (encode_val_length chunk w).
-     apply repeat_Undef_inject_any. }
+    rewrite <- (encode_val_length chunk w).
+     apply repeat_Undef_inject_any.  
   assert (SAME: forall vl1 vl2, vl1 = vl2 -> list_forall2 memval_lessdef vl1 vl2).
-  { intros. subst vl2. revert vl1. induction vl1; constructor; auto.
-     apply memval_lessdef_refl. }
+    intros. subst vl2. revert vl1. induction vl1; constructor; auto.
+     apply memval_lessdef_refl.  
   intros. unfold store_argument in H; destruct chunk.
 - InvAgree. apply SAME. simpl; f_equal. apply encode_int_8_mod.
   change 8 with (Int.size (Int.repr 255)). apply iagree_eqmod; auto.

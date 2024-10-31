@@ -69,7 +69,7 @@ Proof.
       -- apply LT. red. auto.
       -- destruct ( OrderedEqKind.compare ( ekind x ) ( ekind y ) ) as [  l | e1 | l ]. 
         --- apply LT. red. auto.
-        --- apply EQ. red. red in e. red in e0. red in e1. destruct x as [  e1 e0 e eloc0 ereg0 ekind0 ]. destruct y as [  e1 e0 e eloc1 ereg1 ekind1 ]. congruence.
+        --- apply EQ. red. red in e. red in e0. red in e1. destruct x as [ ??? ]. destruct y as [ ??? ]. congruence.
         --- apply GT. red. auto.
       -- apply GT. red. auto.
     - apply GT. red. auto.
@@ -128,7 +128,7 @@ Proof.
       -- apply LT. red. auto.
       -- destruct ( OrderedEqKind.compare ( ekind x ) ( ekind y ) ) as [  l | e1 | l ]. 
         --- apply LT. red. auto.
-        --- apply EQ. red. red in e. red in e0. red in e1. destruct x as [  e1 e0 e eloc0 ereg0 ekind0 ]. destruct y as [  e1 e0 e eloc1 ereg1 ekind1 ]. congruence.
+        --- apply EQ. red. red in e. red in e0. red in e1. destruct x as [ ??? ]. destruct y as [ ??? ]. congruence.
         --- apply GT. red. auto.
       -- apply GT. red. auto.
     - apply GT. red. auto.
@@ -241,11 +241,11 @@ Lemma lub_dup ( x y : t ) ( a b : eqs ) q : EqSet2.In q ( EqSet2.union ( eqs2 a 
 Proof.
    split. 
     - intros H. apply EqSet2.union_1 in H. destruct H as [  H | H ]. 
-      -- rewrite eqs_same in H. rewrite eqs_same in H. apply EqSet.union_2. auto.
-      -- apply EqSet.union_3. auto.
+      -- rewrite eqs_same in H. apply EqSet.union_2. auto.
+      -- rewrite eqs_same in H. apply EqSet.union_3. auto.
     - intros H. apply EqSet.union_1 in H. destruct H as [  H | H ]. 
-      -- rewrite <- eqs_same in H. rewrite <- eqs_same in H. apply EqSet2.union_2. auto.
-      -- apply EqSet2.union_3. auto.
+      -- rewrite <- eqs_same in H. apply EqSet2.union_2. auto.
+      -- rewrite <- eqs_same in H. apply EqSet2.union_3. auto.
 Qed.
 Lemma ge_lub_left : forall x y, ge ( lub x y ) x .
 Proof.

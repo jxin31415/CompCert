@@ -28,8 +28,6 @@ eq_trans2
 eq_refl
 eq_sym
 compare2
-ge_lub_left
-ge_lub_right
 add_equation_dup
 eq_sym2
 ge_trans
@@ -37,3 +35,4 @@ eq_trans2
 eq_refl
 eq_sym
 lt_not_eq2
+ge_lub_right
