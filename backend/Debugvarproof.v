@@ -365,18 +365,18 @@ Proof.
 + apply star_refl.
 + destruct i as [a SAFE]; simpl.
   exploit can_eval_safe_arg; eauto. intros [v1 E1].
-  eapply star_step; eauto.
+  eapply star_step with (t2 := E0).
   econstructor.
   constructor. eexact E1. constructor.
   simpl; constructor.
   simpl; auto.
-  traceEq.
-- eapply star_step; eauto.
+  eauto. eauto.
+- eapply star_step with (t2 := E0).
   econstructor.
   constructor.
   simpl; constructor.
   simpl; auto.
-  traceEq.
+  eauto. eauto.
 Qed.
 
 (** Matching between program states. *)
@@ -518,7 +518,7 @@ Proof.
   exploit function_ptr_translated; eauto. intros [tf [A B]].
   exists (Callstate nil tf (Locmap.init Vundef) m0); split.
   econstructor; eauto. eapply (Genv.init_mem_transf_partial TRANSF); eauto.
-  rewrite (match_program_main TRANSF), symbols_preserved. auto.
+  rewrite (match_program_main TRANSF), symbols_preserved. eauto.
   rewrite <- H3. apply sig_preserved. auto.
   constructor. constructor. auto.
 Qed.
